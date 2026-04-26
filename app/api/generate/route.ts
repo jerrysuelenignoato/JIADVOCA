@@ -19,7 +19,7 @@ const VARIANTES = [
   "Aborde as mudanças pós-Reforma da Previdência e o que mudou na prática.",
 ];
 
-const LIMITES = { trial: 5, mensal: 60, anual: 60 };
+const LIMITES = { trial: 5, mensal: 60, anual: 9999 };
 
 const bodySchema = z.object({
   tipo: z.enum(["carrossel", "reel"]),
