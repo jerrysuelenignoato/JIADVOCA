@@ -66,12 +66,12 @@ export default function PreviewCarrossel({ conteudo }: Props) {
       {/* slides navegáveis */}
       {slides.length > 0 && (
         <div className="border border-border rounded-xl overflow-hidden">
-          {/* preview do slide */}
+          {/* preview do slide — formato 1:1 Instagram */}
           <div
-            className="relative min-h-52 p-6 flex flex-col justify-between"
+            className="relative w-full aspect-square p-8 flex flex-col justify-between"
             style={{
               background: slide?.imagem_url
-                ? `linear-gradient(rgba(12,68,124,0.68), rgba(12,68,124,0.88)), url(${slide.imagem_url}) center/cover no-repeat`
+                ? `linear-gradient(rgba(12,68,124,0.65), rgba(12,68,124,0.88)), url(${slide.imagem_url}) center/cover no-repeat`
                 : "#0C447C",
             }}
           >
