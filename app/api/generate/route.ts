@@ -6,6 +6,7 @@ import { SYSTEM_PROMPT } from "@/lib/prompts/system";
 import { buildCarrosselPrompt } from "@/lib/prompts/carrossel";
 import { buildReelPrompt } from "@/lib/prompts/reel";
 import { getMesAtual } from "@/lib/utils";
+import { buscarImagemUnsplash } from "@/lib/unsplash";
 
 const LIMITES = { trial: 5, mensal: 60, anual: 60 };
 
@@ -76,6 +77,19 @@ export async function POST(req: NextRequest) {
         : buildReelPrompt(area, tom, duracao ?? 60, extra);
 
     const conteudo = await gerarConteudo(SYSTEM_PROMPT, userPrompt);
+
+    // buscar imagens Unsplash para cada slide do carrossel
+    if (tipo === "carrossel") {
+      const slides = conteudo.slides as Array<Record<string, unknown>> | undefined;
+      if (slides && process.env.UNSPLASH_ACCESS_KEY) {
+        await Promise.all(
+          slides.map(async (slide) => {
+            const query = slide.imagem_query as string | undefined;
+            if (query) slide.imagem_url = await buscarImagemUnsplash(query);
+          })
+        );
+      }
+    }
 
     // salvar na biblioteca
     const { data: saved } = await supabase

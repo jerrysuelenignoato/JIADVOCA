@@ -12,6 +12,7 @@ type Slide = {
   subtitulo?: string;
   corpo?: string;
   visual?: string;
+  imagem_url?: string;
 };
 
 type Props = {
@@ -66,7 +67,14 @@ export default function PreviewCarrossel({ conteudo }: Props) {
       {slides.length > 0 && (
         <div className="border border-border rounded-xl overflow-hidden">
           {/* preview do slide */}
-          <div className="bg-[#0C447C] min-h-44 p-6 flex flex-col justify-between">
+          <div
+            className="relative min-h-52 p-6 flex flex-col justify-between"
+            style={{
+              background: slide?.imagem_url
+                ? `linear-gradient(rgba(12,68,124,0.68), rgba(12,68,124,0.88)), url(${slide.imagem_url}) center/cover no-repeat`
+                : "#0C447C",
+            }}
+          >
             <Badge variant="secondary" className="w-fit text-xs bg-white/20 text-white border-0">
               Slide {slide?.numero} — {slide?.tipo}
             </Badge>
@@ -82,15 +90,6 @@ export default function PreviewCarrossel({ conteudo }: Props) {
               )}
             </div>
           </div>
-
-          {/* sugestão visual */}
-          {slide?.visual && (
-            <div className="px-4 py-2.5 bg-secondary/50 border-t border-border">
-              <p className="text-xs text-muted-foreground">
-                <span className="font-medium">Design: </span>{slide.visual}
-              </p>
-            </div>
-          )}
 
           {/* controles */}
           <div className="flex items-center justify-between px-4 py-2.5 border-t border-border">
