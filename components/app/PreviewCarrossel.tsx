@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Copy, Check, ChevronLeft, ChevronRight } from "lucide-react";
 import { toast } from "sonner";
-import { Badge } from "@/components/ui/badge";
 
 type Slide = {
   numero: number;
@@ -11,8 +10,6 @@ type Slide = {
   titulo?: string;
   subtitulo?: string;
   corpo?: string;
-  visual?: string;
-  imagem_url?: string;
 };
 
 type Props = {
@@ -25,6 +22,18 @@ type Props = {
     cta_sugerido?: string;
   };
 };
+
+const BG_GRADIENTS = [
+  "linear-gradient(135deg, #0B3D6B 0%, #185FA5 100%)",
+  "linear-gradient(150deg, #061828 0%, #0C447C 100%)",
+  "linear-gradient(135deg, #093322 0%, #0F6E56 100%)",
+  "linear-gradient(145deg, #0a0e1a 0%, #0C447C 100%)",
+  "linear-gradient(135deg, #0C447C 0%, #093322 100%)",
+  "linear-gradient(150deg, #120a28 0%, #0C447C 100%)",
+  "linear-gradient(135deg, #061828 0%, #0F6E56 100%)",
+];
+
+const ACCENT_COLORS = ["#0F6E56", "#185FA5", "#D97706", "#0F6E56", "#185FA5", "#0F6E56", "#D97706"];
 
 function CopyBtn({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -50,6 +59,10 @@ export default function PreviewCarrossel({ conteudo }: Props) {
   const [idx, setIdx] = useState(0);
   const slide = slides[idx];
 
+  const bgIdx = (slide?.numero ?? 1) - 1;
+  const bg = BG_GRADIENTS[bgIdx % BG_GRADIENTS.length];
+  const accent = ACCENT_COLORS[bgIdx % ACCENT_COLORS.length];
+
   return (
     <div className="space-y-4">
       {/* headline */}
@@ -63,74 +76,79 @@ export default function PreviewCarrossel({ conteudo }: Props) {
         </div>
       )}
 
-      {/* slides navegáveis */}
+      {/* slide — formato 1:1 Instagram */}
       {slides.length > 0 && (
         <div className="border border-border rounded-xl overflow-hidden">
-          {/* preview do slide — formato 1:1 Instagram */}
           <div
-            className="relative w-full aspect-square overflow-hidden flex flex-col justify-between"
-            style={{
-              backgroundColor: "#0C447C",
-              ...(slide?.imagem_url && {
-                backgroundImage: `url(${slide.imagem_url})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }),
-            }}
+            className="relative w-full aspect-square overflow-hidden flex flex-col"
+            style={{ background: bg }}
           >
-            {/* gradiente — cobre 60% inferior para texto legível */}
-            <div
-              className="absolute inset-0"
-              style={{
-                background: slide?.imagem_url
-                  ? "linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.1) 35%, rgba(0,0,0,0.82) 65%, rgba(0,0,0,0.92) 100%)"
-                  : "linear-gradient(135deg, #0C447C 0%, #0a3660 100%)",
-              }}
-            />
+            {/* círculos decorativos de fundo */}
+            <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full"
+              style={{ background: "rgba(255,255,255,0.04)" }} />
+            <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full"
+              style={{ background: "rgba(255,255,255,0.03)" }} />
 
-            {/* badge topo */}
-            <div className="relative z-10 p-4">
-              <Badge variant="secondary" className="w-fit text-[10px] bg-black/35 text-white border-0 backdrop-blur-sm uppercase tracking-widest">
-                {slide?.tipo}
-              </Badge>
-            </div>
+            {/* conteúdo */}
+            <div className="relative z-10 flex flex-col h-full p-8">
+              {/* topo */}
+              <div className="flex items-center justify-between mb-auto">
+                <span className="text-white/40 text-[9px] tracking-[0.3em] uppercase font-medium">
+                  {slide?.tipo}
+                </span>
+                <span className="text-white/25 text-[9px] tracking-[0.2em] uppercase">
+                  JIADVOCA
+                </span>
+              </div>
 
-            {/* texto — ocupa a metade inferior */}
-            <div className="relative z-10 px-7 pb-7 space-y-2">
-              {slide?.titulo && (
-                <p className="text-white font-serif font-semibold leading-[1.1] drop-shadow-2xl"
-                   style={{ fontSize: "clamp(1.6rem, 5vw, 2.4rem)" }}>
-                  {slide.titulo}
-                </p>
-              )}
-              {(slide?.subtitulo || slide?.corpo) && (
-                <p className="text-white/80 font-light leading-relaxed drop-shadow"
-                   style={{ fontSize: "clamp(0.8rem, 2vw, 1rem)" }}>
-                  {slide.subtitulo ?? slide.corpo}
-                </p>
-              )}
-              <p className="text-white/40 text-[0.6rem] tracking-[0.25em] uppercase pt-1">JIADVOCA</p>
+              {/* título principal — domina o slide */}
+              <div className="flex-1 flex flex-col justify-center py-4">
+                {/* linha acento */}
+                <div className="w-10 h-[3px] rounded-full mb-5" style={{ background: accent }} />
+
+                {slide?.titulo && (
+                  <p
+                    className="text-white font-serif font-semibold leading-[1.08] tracking-tight"
+                    style={{ fontSize: "clamp(1.9rem, 6.5vw, 3.2rem)" }}
+                  >
+                    {slide.titulo}
+                  </p>
+                )}
+
+                {(slide?.subtitulo || slide?.corpo) && (
+                  <p
+                    className="text-white/70 mt-5 leading-relaxed font-light"
+                    style={{ fontSize: "clamp(0.82rem, 2.2vw, 1rem)" }}
+                  >
+                    {slide.subtitulo ?? slide.corpo}
+                  </p>
+                )}
+              </div>
+
+              {/* rodapé */}
+              <div className="flex items-center justify-between mt-auto">
+                <div className="w-8 h-[1.5px] rounded-full" style={{ background: accent }} />
+                <span className="text-white/20 text-[9px] font-light">
+                  {slide?.numero} / {slides.length}
+                </span>
+              </div>
             </div>
           </div>
 
-          {/* controles */}
-          <div className="flex items-center justify-between px-4 py-2.5 border-t border-border">
+          {/* navegação */}
+          <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-white">
             <button
               onClick={() => setIdx((i) => Math.max(0, i - 1))}
               disabled={idx === 0}
               className="p-1 rounded hover:bg-secondary disabled:opacity-30 transition-colors"
-              aria-label="Slide anterior"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="text-xs text-muted-foreground">
-              {idx + 1} / {slides.length}
-            </span>
+            <span className="text-xs text-muted-foreground">{idx + 1} / {slides.length}</span>
             <button
               onClick={() => setIdx((i) => Math.min(slides.length - 1, i + 1))}
               disabled={idx === slides.length - 1}
               className="p-1 rounded hover:bg-secondary disabled:opacity-30 transition-colors"
-              aria-label="Próximo slide"
             >
               <ChevronRight className="h-4 w-4" />
             </button>
@@ -148,9 +166,7 @@ export default function PreviewCarrossel({ conteudo }: Props) {
           <p className="text-sm leading-relaxed whitespace-pre-wrap">{conteudo.legenda}</p>
           {conteudo.hashtags && (
             <p className="mt-2 text-sm text-[#185FA5] flex flex-wrap gap-1">
-              {conteudo.hashtags.map((h) => (
-                <span key={h}>{h}</span>
-              ))}
+              {conteudo.hashtags.map((h) => <span key={h}>{h}</span>)}
             </p>
           )}
         </div>

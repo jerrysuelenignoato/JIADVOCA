@@ -6,7 +6,18 @@ import { SYSTEM_PROMPT } from "@/lib/prompts/system";
 import { buildCarrosselPrompt } from "@/lib/prompts/carrossel";
 import { buildReelPrompt } from "@/lib/prompts/reel";
 import { getMesAtual } from "@/lib/utils";
-import { buildSlideImageUrl } from "@/lib/imageai";
+const VARIANTES = [
+  "Aborde pelo ângulo de quem quase perdeu o benefício por desconhecer o prazo.",
+  "Foque nos erros burocráticos mais comuns que levam ao indeferimento.",
+  "Desmonte mitos populares com artigos e dados reais do INSS.",
+  "Apresente como um guia prático com passos numerados e objetivos.",
+  "Destaque as diferenças sutis que confundem quem tenta solicitar o benefício.",
+  "Explore as consequências financeiras de atrasar ou errar o pedido.",
+  "Aborde pelo ponto de vista de quem está a 2 anos de se aposentar.",
+  "Explique os documentos necessários e como organizar cada um.",
+  "Foque nos casos em que o INSS nega indevidamente e como recorrer.",
+  "Aborde as mudanças pós-Reforma da Previdência e o que mudou na prática.",
+];
 
 const LIMITES = { trial: 5, mensal: 60, anual: 60 };
 
@@ -70,22 +81,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Cota do mês esgotada", code: "QUOTA_EXCEEDED" }, { status: 429 });
     }
 
-    // gerar conteúdo via Groq
+    // variante aleatória garante conteúdo único por geração
+    const variante = VARIANTES[Math.floor(Math.random() * VARIANTES.length)];
+
     const userPrompt =
       tipo === "carrossel"
-        ? buildCarrosselPrompt(area, tom, slides ?? 7, extra)
-        : buildReelPrompt(area, tom, duracao ?? 60, extra);
+        ? buildCarrosselPrompt(area, tom, slides ?? 7, extra) + `\n\nAbordagem exclusiva para esta geração: ${variante}`
+        : buildReelPrompt(area, tom, duracao ?? 60, extra) + `\n\nAbordagem exclusiva para esta geração: ${variante}`;
 
     const conteudo = await gerarConteudo(SYSTEM_PROMPT, userPrompt);
-
-    // gerar URLs de imagem IA para cada slide do carrossel
-    if (tipo === "carrossel") {
-      const slideList = conteudo.slides as Array<Record<string, unknown>> | undefined;
-      slideList?.forEach((slide, i) => {
-        const prompt = (slide.imagem_prompt ?? slide.imagem_query) as string | undefined;
-        if (prompt) slide.imagem_url = buildSlideImageUrl(prompt, i * 137 + Date.now() % 9999);
-      });
-    }
 
     // salvar na biblioteca
     const { data: saved } = await supabase
