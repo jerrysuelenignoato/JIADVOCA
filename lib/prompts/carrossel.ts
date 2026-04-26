@@ -26,7 +26,7 @@ Retorne SOMENTE JSON válido (sem markdown, sem \`\`\`):
       "titulo": "título com fato surpreendente ou mito comum que para o scroll",
       "subtitulo": "o que você vai descobrir neste carrossel",
       "visual": "sugestão de composição visual",
-      "imagem_prompt": "english AI image prompt: legal object or abstract concept, no people (e.g. golden scales of justice on marble, soft blue light)"
+      "imagem_query": "english photo query — ONLY objects or places, NEVER people (e.g. 'justice scales marble', 'law books shelf', 'courthouse columns')"
     },
     {
       "numero": 2,
@@ -34,7 +34,7 @@ Retorne SOMENTE JSON válido (sem markdown, sem \`\`\`):
       "titulo": "ponto educativo com dado real",
       "corpo": "explicação clara em 2-3 frases com informação verificável",
       "visual": "sugestão visual",
-      "imagem_prompt": "english AI image prompt: object or place, no people (e.g. legal documents on wooden desk, natural light)"
+      "imagem_query": "english photo query — ONLY objects or places, NEVER people (e.g. 'legal documents desk', 'retirement papers calculator')"
     }
   ],
   "legenda": "legenda completa (150-200 palavras) educativa e conversacional, sem inventar histórias",

@@ -6,6 +6,8 @@ import { SYSTEM_PROMPT } from "@/lib/prompts/system";
 import { buildCarrosselPrompt } from "@/lib/prompts/carrossel";
 import { buildReelPrompt } from "@/lib/prompts/reel";
 import { getMesAtual } from "@/lib/utils";
+import { buscarImagemUnsplash } from "@/lib/unsplash";
+
 const VARIANTES = [
   "Aborde pelo ângulo de quem quase perdeu o benefício por desconhecer o prazo.",
   "Foque nos erros burocráticos mais comuns que levam ao indeferimento.",
@@ -90,6 +92,19 @@ export async function POST(req: NextRequest) {
         : buildReelPrompt(area, tom, duracao ?? 60, extra) + `\n\nAbordagem exclusiva para esta geração: ${variante}`;
 
     const conteudo = await gerarConteudo(SYSTEM_PROMPT, userPrompt);
+
+    // buscar imagens Unsplash para cada slide do carrossel
+    if (tipo === "carrossel") {
+      const slideList = conteudo.slides as Array<Record<string, unknown>> | undefined;
+      if (slideList && process.env.UNSPLASH_ACCESS_KEY) {
+        await Promise.all(
+          slideList.map(async (slide) => {
+            const query = (slide.imagem_query ?? slide.imagem_prompt) as string | undefined;
+            if (query) slide.imagem_url = await buscarImagemUnsplash(query);
+          })
+        );
+      }
+    }
 
     // salvar na biblioteca
     const { data: saved } = await supabase

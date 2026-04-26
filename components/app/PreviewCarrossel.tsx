@@ -10,6 +10,7 @@ type Slide = {
   titulo?: string;
   subtitulo?: string;
   corpo?: string;
+  imagem_url?: string;
 };
 
 type Props = {
@@ -81,13 +82,29 @@ export default function PreviewCarrossel({ conteudo }: Props) {
         <div className="border border-border rounded-xl overflow-hidden">
           <div
             className="relative w-full aspect-square overflow-hidden flex flex-col"
-            style={{ background: bg }}
+            style={{
+              background: bg,
+              ...(slide?.imagem_url && {
+                backgroundImage: `url(${slide.imagem_url})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }),
+            }}
           >
-            {/* círculos decorativos de fundo */}
-            <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full"
-              style={{ background: "rgba(255,255,255,0.04)" }} />
-            <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full"
-              style={{ background: "rgba(255,255,255,0.03)" }} />
+            {/* overlay gradiente sobre a foto */}
+            <div className="absolute inset-0" style={{
+              background: slide?.imagem_url
+                ? "linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.80) 65%, rgba(0,0,0,0.92) 100%)"
+                : "linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 100%)",
+            }} />
+
+            {/* círculos decorativos (só sem foto) */}
+            {!slide?.imagem_url && <>
+              <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full"
+                style={{ background: "rgba(255,255,255,0.04)" }} />
+              <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full"
+                style={{ background: "rgba(255,255,255,0.03)" }} />
+            </>}
 
             {/* conteúdo */}
             <div className="relative z-10 flex flex-col h-full p-8">
