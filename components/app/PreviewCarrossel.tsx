@@ -68,26 +68,54 @@ export default function PreviewCarrossel({ conteudo }: Props) {
         <div className="border border-border rounded-xl overflow-hidden">
           {/* preview do slide — formato 1:1 Instagram */}
           <div
-            className="relative w-full aspect-square p-8 flex flex-col justify-between"
+            className="relative w-full aspect-square overflow-hidden flex flex-col justify-between"
             style={{
-              background: slide?.imagem_url
-                ? `linear-gradient(rgba(12,68,124,0.65), rgba(12,68,124,0.88)), url(${slide.imagem_url}) center/cover no-repeat`
-                : "#0C447C",
+              backgroundColor: "#0C447C",
+              ...(slide?.imagem_url && {
+                backgroundImage: `url(${slide.imagem_url})`,
+                backgroundSize: "cover",
+                backgroundPosition: "center",
+              }),
             }}
           >
-            <Badge variant="secondary" className="w-fit text-xs bg-white/20 text-white border-0">
-              Slide {slide?.numero} — {slide?.tipo}
-            </Badge>
-            <div className="mt-4">
+            {/* gradiente escuro só na base — deixa a foto respirar */}
+            <div
+              className="absolute inset-0"
+              style={{
+                background: slide?.imagem_url
+                  ? "linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.78) 100%)"
+                  : "linear-gradient(to bottom, rgba(12,68,124,0.4) 0%, rgba(12,68,124,0.95) 100%)",
+              }}
+            />
+
+            {/* badge topo */}
+            <div className="relative z-10 p-5">
+              <Badge variant="secondary" className="w-fit text-xs bg-black/30 text-white border-0 backdrop-blur-sm">
+                Slide {slide?.numero} — {slide?.tipo}
+              </Badge>
+            </div>
+
+            {/* texto base */}
+            <div className="relative z-10 p-7 pb-8 space-y-3">
               {slide?.titulo && (
-                <p className="text-white font-semibold text-lg leading-snug">{slide.titulo}</p>
+                <p className="text-white font-serif text-[2.1rem] leading-[1.15] drop-shadow-lg tracking-tight">
+                  {slide.titulo}
+                </p>
               )}
               {slide?.subtitulo && (
-                <p className="text-white/80 text-sm mt-1">{slide.subtitulo}</p>
+                <p className="text-white/85 text-[0.95rem] font-light leading-relaxed tracking-wide drop-shadow">
+                  {slide.subtitulo}
+                </p>
               )}
               {slide?.corpo && (
-                <p className="text-white/80 text-sm mt-2 leading-relaxed">{slide.corpo}</p>
+                <p className="text-white/85 text-[0.95rem] font-light leading-relaxed tracking-wide drop-shadow">
+                  {slide.corpo}
+                </p>
               )}
+              {/* linha de marca */}
+              <div className="pt-1">
+                <span className="text-white/50 text-[0.7rem] tracking-[0.2em] uppercase font-medium">JIADVOCA</span>
+              </div>
             </div>
           </div>
 
