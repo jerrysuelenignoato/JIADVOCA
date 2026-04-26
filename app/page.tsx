@@ -103,9 +103,9 @@ export default function HomePage() {
               Para advogados previdenciaristas
             </span>
             <h1 className="font-serif text-4xl sm:text-5xl lg:text-6xl font-normal leading-tight text-[#1C1917]">
-              Pare de escrever
+              Alcance seus clientes
               <br />
-              <span className="text-[#0C447C]">igual advogado.</span>
+              <span className="text-[#0C447C]">da melhor forma.</span>
             </h1>
             <p className="mt-6 text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
               Gere carrosséis e reels magnéticos para o Instagram em menos de 2 minutos — sem juridiquês, sem página em branco, sem terceirizar.

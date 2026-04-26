@@ -8,7 +8,7 @@ export default function Footer() {
           <div>
             <span className="text-xl font-semibold tracking-brand text-[#0C447C]">JIADVOCA</span>
             <p className="mt-2 text-sm text-muted-foreground max-w-xs">
-              Conteúdo magnético para a advocacia previdenciária. Pare de escrever igual advogado.
+              Conteúdo magnético para a advocacia previdenciária. Alcance seus clientes da melhor forma.
             </p>
           </div>
           <div>

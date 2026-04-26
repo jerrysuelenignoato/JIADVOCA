@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     template: "%s | JIADVOCA",
   },
   description:
-    "Pare de escrever igual advogado. Comece a vender igual marketeiro. Gere carrosséis e reels irresistíveis para o Instagram com IA — em menos de 2 minutos.",
+    "Alcance seus clientes da melhor forma. Gere carrosséis e reels irresistíveis para o Instagram com IA — em menos de 2 minutos.",
   keywords: [
     "marketing jurídico",
     "conteúdo para advogados",
