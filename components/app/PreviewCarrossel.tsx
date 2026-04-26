@@ -78,44 +78,38 @@ export default function PreviewCarrossel({ conteudo }: Props) {
               }),
             }}
           >
-            {/* gradiente escuro só na base — deixa a foto respirar */}
+            {/* gradiente — cobre 60% inferior para texto legível */}
             <div
               className="absolute inset-0"
               style={{
                 background: slide?.imagem_url
-                  ? "linear-gradient(to bottom, rgba(0,0,0,0.08) 0%, rgba(0,0,0,0.15) 40%, rgba(0,0,0,0.78) 100%)"
-                  : "linear-gradient(to bottom, rgba(12,68,124,0.4) 0%, rgba(12,68,124,0.95) 100%)",
+                  ? "linear-gradient(to bottom, rgba(0,0,0,0.05) 0%, rgba(0,0,0,0.1) 35%, rgba(0,0,0,0.82) 65%, rgba(0,0,0,0.92) 100%)"
+                  : "linear-gradient(135deg, #0C447C 0%, #0a3660 100%)",
               }}
             />
 
             {/* badge topo */}
-            <div className="relative z-10 p-5">
-              <Badge variant="secondary" className="w-fit text-xs bg-black/30 text-white border-0 backdrop-blur-sm">
-                Slide {slide?.numero} — {slide?.tipo}
+            <div className="relative z-10 p-4">
+              <Badge variant="secondary" className="w-fit text-[10px] bg-black/35 text-white border-0 backdrop-blur-sm uppercase tracking-widest">
+                {slide?.tipo}
               </Badge>
             </div>
 
-            {/* texto base */}
-            <div className="relative z-10 p-7 pb-8 space-y-3">
+            {/* texto — ocupa a metade inferior */}
+            <div className="relative z-10 px-7 pb-7 space-y-2">
               {slide?.titulo && (
-                <p className="text-white font-serif text-[2.1rem] leading-[1.15] drop-shadow-lg tracking-tight">
+                <p className="text-white font-serif font-semibold leading-[1.1] drop-shadow-2xl"
+                   style={{ fontSize: "clamp(1.6rem, 5vw, 2.4rem)" }}>
                   {slide.titulo}
                 </p>
               )}
-              {slide?.subtitulo && (
-                <p className="text-white/85 text-[0.95rem] font-light leading-relaxed tracking-wide drop-shadow">
-                  {slide.subtitulo}
+              {(slide?.subtitulo || slide?.corpo) && (
+                <p className="text-white/80 font-light leading-relaxed drop-shadow"
+                   style={{ fontSize: "clamp(0.8rem, 2vw, 1rem)" }}>
+                  {slide.subtitulo ?? slide.corpo}
                 </p>
               )}
-              {slide?.corpo && (
-                <p className="text-white/85 text-[0.95rem] font-light leading-relaxed tracking-wide drop-shadow">
-                  {slide.corpo}
-                </p>
-              )}
-              {/* linha de marca */}
-              <div className="pt-1">
-                <span className="text-white/50 text-[0.7rem] tracking-[0.2em] uppercase font-medium">JIADVOCA</span>
-              </div>
+              <p className="text-white/40 text-[0.6rem] tracking-[0.25em] uppercase pt-1">JIADVOCA</p>
             </div>
           </div>
 
