@@ -1,11 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Wand2, Loader2, RefreshCw, BookOpen } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Badge } from "@/components/ui/badge";
+import { useState, useEffect } from "react";
+import { Wand2, Loader2, ArrowRight, ChevronLeft, RefreshCw, BookOpen } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import PreviewCarrossel from "@/components/app/PreviewCarrossel";
 import PreviewReel from "@/components/app/PreviewReel";
@@ -13,218 +9,258 @@ import UpgradeModal from "@/components/app/UpgradeModal";
 import { useGerar } from "@/hooks/useGerar";
 import { AREAS_PREVIDENCIARIAS, TONS_CONTEUDO } from "@/lib/utils";
 
-const DURACOES = [15, 30, 60, 90];
+type Narrativa = { titulo: string; descricao: string };
+type Etapa = "tema" | "narrativa" | "resultado";
 
 export default function GerarPage() {
   const { gerar, loading, resultado, setResultado, loadingMsg, upgradeMotivo, fecharUpgrade } = useGerar();
 
+  const [etapa, setEtapa] = useState<Etapa>("tema");
+  const [tema, setTema] = useState("");
+  const [narrativas, setNarrativas] = useState<Narrativa[]>([]);
+  const [narrativaIdx, setNarrativaIdx] = useState<number | null>(null);
+  const [loadingNarrativas, setLoadingNarrativas] = useState(false);
   const [tipo, setTipo] = useState<"carrossel" | "reel">("carrossel");
-  const [area, setArea] = useState("");
   const [tom, setTom] = useState("");
-  const [slides, setSlides] = useState(7);
-  const [duracao, setDuracao] = useState(60);
-  const [extra, setExtra] = useState("");
 
-  function handleGerar() {
-    if (!area || !tom) return;
-    gerar({ tipo, area, tom, slides: tipo === "carrossel" ? slides : undefined, duracao: tipo === "reel" ? duracao : undefined, extra: extra || undefined });
+  useEffect(() => {
+    if (resultado) setEtapa("resultado");
+  }, [resultado]);
+
+  async function buscarAngulos(temaOverride?: string) {
+    const t = (temaOverride ?? tema).trim();
+    if (!t) return;
+    setLoadingNarrativas(true);
+    setNarrativas([]);
+    setNarrativaIdx(null);
+    setResultado(null);
+    setEtapa("narrativa");
+    try {
+      const res = await fetch("/api/narratives", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tema: t }),
+      });
+      const data = await res.json();
+      setNarrativas(data.narrativas ?? []);
+    } catch {
+      setEtapa("tema");
+    } finally {
+      setLoadingNarrativas(false);
+    }
   }
 
-  const pronto = area && tom;
+  function handleGerar() {
+    if (narrativaIdx === null || !tom) return;
+    const narrativa = narrativas[narrativaIdx];
+    gerar({
+      tipo,
+      area: tema,
+      tom,
+      slides: tipo === "carrossel" ? 7 : undefined,
+      duracao: tipo === "reel" ? 60 : undefined,
+      extra: `Ângulo narrativo escolhido: "${narrativa.titulo}". ${narrativa.descricao}`,
+    });
+  }
+
+  function voltarParaNarrativa() {
+    setResultado(null);
+    setEtapa("narrativa");
+  }
+
+  function voltarParaTema() {
+    setEtapa("tema");
+    setNarrativas([]);
+    setNarrativaIdx(null);
+    setResultado(null);
+  }
 
   return (
-    <div className="flex flex-col lg:flex-row min-h-full">
-      {/* ── coluna esquerda: configuração (40%) ─────────── */}
-      <aside className="w-full lg:w-[40%] lg:max-w-sm xl:max-w-md border-r border-border bg-white p-6 space-y-6 shrink-0">
-        <div>
-          <h1 className="text-xl font-semibold">Gerar conteúdo</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Configure e clique em gerar</p>
-        </div>
+    <div className="min-h-full bg-[#FAFAF9]">
+      <div className="max-w-2xl mx-auto px-4 py-10">
 
-        {/* toggle tipo */}
-        <div>
-          <Label className="text-xs uppercase tracking-wide text-muted-foreground mb-2 block">Formato</Label>
-          <div className="flex rounded-lg border border-border overflow-hidden">
-            {(["carrossel", "reel"] as const).map((t) => (
+        {/* ── Etapa 1: Tema ── */}
+        {etapa === "tema" && (
+          <div className="space-y-8">
+            <div className="text-center space-y-1">
+              <h1 className="text-2xl font-semibold text-[#1C1917]">O que você quer criar hoje?</h1>
+              <p className="text-sm text-muted-foreground">Digite um tema ou escolha uma sugestão</p>
+            </div>
+
+            <div className="relative">
+              <input
+                autoFocus
+                type="text"
+                value={tema}
+                onChange={(e) => setTema(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && buscarAngulos()}
+                placeholder="Ex: Aposentadoria por invalidez, BPC para idosos..."
+                className="w-full h-14 px-5 pr-14 rounded-2xl border border-border bg-white text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-[#0C447C]/30"
+              />
               <button
-                key={t}
-                onClick={() => { setTipo(t); setResultado(null); }}
-                className={`flex-1 py-2 text-sm font-medium transition-colors capitalize ${tipo === t ? "bg-[#0C447C] text-white" : "hover:bg-secondary text-muted-foreground"}`}
+                onClick={() => buscarAngulos()}
+                disabled={!tema.trim()}
+                className="absolute right-3 top-3 h-8 w-8 rounded-xl bg-[#0C447C] text-white flex items-center justify-center disabled:opacity-40 hover:bg-[#185FA5] transition-colors"
               >
-                {t === "carrossel" ? "🖼 Carrossel" : "🎬 Reel"}
+                <ArrowRight className="h-4 w-4" />
               </button>
-            ))}
-          </div>
-        </div>
-
-        {/* área */}
-        <div>
-          <Label className="text-xs uppercase tracking-wide text-muted-foreground mb-2 block">Área previdenciária</Label>
-          <div className="flex flex-col gap-1.5 max-h-52 overflow-y-auto pr-1">
-            {AREAS_PREVIDENCIARIAS.map((a) => (
-              <button
-                key={a}
-                onClick={() => setArea(a)}
-                className={`text-left px-3 py-2 rounded-lg text-sm transition-colors ${area === a ? "bg-[#0C447C] text-white" : "hover:bg-secondary text-foreground border border-border"}`}
-              >
-                {a}
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* tom */}
-        <div>
-          <Label className="text-xs uppercase tracking-wide text-muted-foreground mb-2 block">Tom do conteúdo</Label>
-          <div className="grid grid-cols-2 gap-2">
-            {TONS_CONTEUDO.map(({ valor, label, desc }) => (
-              <button
-                key={valor}
-                onClick={() => setTom(valor)}
-                className={`text-left p-3 rounded-lg border transition-colors ${tom === valor ? "border-[#0C447C] bg-[#0C447C]/5" : "border-border hover:bg-secondary"}`}
-              >
-                <p className={`text-sm font-medium ${tom === valor ? "text-[#0C447C]" : ""}`}>{label}</p>
-                <p className="text-xs text-muted-foreground mt-0.5">{desc}</p>
-              </button>
-            ))}
-          </div>
-        </div>
-
-        {/* slides ou duração */}
-        {tipo === "carrossel" ? (
-          <div>
-            <Label className="text-xs uppercase tracking-wide text-muted-foreground mb-2 block">
-              Número de slides: <span className="font-semibold text-foreground">{slides}</span>
-            </Label>
-            <input
-              type="range"
-              min={3}
-              max={10}
-              step={1}
-              value={slides}
-              onChange={(e) => setSlides(Number(e.target.value))}
-              className="mt-2 w-full accent-[#0C447C]"
-            />
-            <div className="flex justify-between text-xs text-muted-foreground mt-1">
-              <span>3</span><span>10</span>
             </div>
-          </div>
-        ) : (
-          <div>
-            <Label className="text-xs uppercase tracking-wide text-muted-foreground mb-2 block">Duração do reel</Label>
-            <div className="flex gap-2">
-              {DURACOES.map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setDuracao(d)}
-                  className={`flex-1 py-2 rounded-lg border text-sm font-medium transition-colors ${duracao === d ? "border-[#0C447C] bg-[#0C447C]/5 text-[#0C447C]" : "border-border hover:bg-secondary"}`}
-                >
-                  {d}s
-                </button>
-              ))}
-            </div>
-          </div>
-        )}
 
-        {/* extra */}
-        <div>
-          <Label htmlFor="extra" className="text-xs uppercase tracking-wide text-muted-foreground mb-2 block">
-            Personalização <span className="normal-case font-normal">(opcional)</span>
-          </Label>
-          <Textarea
-            id="extra"
-            placeholder="Ex: Foque em aposentadoria rural para trabalhadores de MG. Mencione a Lei 8.213/91."
-            rows={3}
-            value={extra}
-            onChange={(e) => setExtra(e.target.value)}
-            className="text-sm resize-none"
-            maxLength={500}
-          />
-          <p className="text-xs text-muted-foreground text-right mt-1">{extra.length}/500</p>
-        </div>
-
-        {/* botão gerar */}
-        <Button
-          onClick={handleGerar}
-          disabled={!pronto || loading}
-          className="w-full bg-[#0C447C] hover:bg-[#185FA5] text-white h-11"
-        >
-          {loading ? (
-            <><Loader2 className="h-4 w-4 mr-2 animate-spin" /> Gerando...</>
-          ) : (
-            <><Wand2 className="h-4 w-4 mr-2" /> Gerar com IA</>
-          )}
-        </Button>
-
-        {!pronto && (
-          <p className="text-xs text-center text-muted-foreground -mt-2">
-            Selecione uma área e um tom para continuar
-          </p>
-        )}
-      </aside>
-
-      {/* ── coluna direita: preview (60%) ───────────────── */}
-      <main className="flex-1 p-6 overflow-y-auto">
-        {/* estado vazio */}
-        {!loading && !resultado && (
-          <div className="h-full flex flex-col items-center justify-center text-center py-20">
-            <div className="w-16 h-16 rounded-2xl bg-[#0C447C]/10 flex items-center justify-center mb-4">
-              <Wand2 className="h-7 w-7 text-[#0C447C]" />
-            </div>
-            <h2 className="text-lg font-semibold">Nenhum conteúdo gerado ainda</h2>
-            <p className="text-muted-foreground text-sm mt-1 max-w-xs">
-              Configure o formato, área e tom à esquerda e clique em <strong>Gerar com IA</strong>
-            </p>
-          </div>
-        )}
-
-        {/* estado loading */}
-        {loading && (
-          <div className="space-y-4 max-w-xl">
-            <div className="flex items-center gap-3 mb-6">
-              <Loader2 className="h-5 w-5 text-[#0C447C] animate-spin" />
-              <p className="text-sm font-medium text-[#0C447C] animate-pulse">{loadingMsg}</p>
-            </div>
-            <Skeleton className="h-16 rounded-lg" />
-            <Skeleton className="h-48 rounded-xl" />
-            <Skeleton className="h-28 rounded-xl" />
-            <Skeleton className="h-10 rounded-lg" />
-          </div>
-        )}
-
-        {/* resultado */}
-        {!loading && resultado && (
-          <div className="max-w-xl">
-            {/* ações */}
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Badge className="bg-[#0F6E56]/10 text-[#0F6E56] border-[#0F6E56]/20 hover:bg-[#0F6E56]/10">
-                  Salvo na biblioteca
-                </Badge>
-                {resultado.cotaRestante !== undefined && (
-                  <Badge variant="outline" className="text-muted-foreground">
-                    {resultado.cotaRestante} gerações restantes
-                  </Badge>
-                )}
+            <div>
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Sugestões</p>
+              <div className="flex flex-wrap gap-2">
+                {AREAS_PREVIDENCIARIAS.map((area) => (
+                  <button
+                    key={area}
+                    onClick={() => { setTema(area); buscarAngulos(area); }}
+                    className="px-4 py-2 rounded-full border border-border bg-white text-sm hover:border-[#0C447C] hover:text-[#0C447C] transition-colors"
+                  >
+                    {area}
+                  </button>
+                ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Etapa 2: Narrativa ── */}
+        {etapa === "narrativa" && (
+          <div className="space-y-6">
+            <div className="flex items-center gap-3">
+              <button onClick={voltarParaTema} className="text-muted-foreground hover:text-foreground transition-colors">
+                <ChevronLeft className="h-5 w-5" />
+              </button>
+              <div>
+                <p className="text-xs text-muted-foreground uppercase tracking-wide font-medium">{tema}</p>
+                <h1 className="text-xl font-semibold text-[#1C1917]">1. Escolha o ângulo</h1>
+              </div>
+            </div>
+
+            {loadingNarrativas ? (
+              <div className="space-y-3">
+                <Skeleton className="h-24 rounded-2xl" />
+                <Skeleton className="h-24 rounded-2xl" />
+                <Skeleton className="h-24 rounded-2xl" />
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {narrativas.map((n, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setNarrativaIdx(narrativaIdx === i ? null : i)}
+                    className={`w-full text-left p-5 rounded-2xl border-2 transition-all ${
+                      narrativaIdx === i
+                        ? "border-[#0C447C] bg-[#0C447C]/5"
+                        : "border-border bg-white hover:border-[#0C447C]/30"
+                    }`}
+                  >
+                    <p className={`font-semibold text-base leading-snug ${narrativaIdx === i ? "text-[#0C447C]" : "text-[#1C1917]"}`}>
+                      {n.titulo}
+                    </p>
+                    <p className="text-sm text-muted-foreground mt-1">{n.descricao}</p>
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {narrativaIdx !== null && !loadingNarrativas && (
+              <div className="bg-white border border-border rounded-2xl p-5 space-y-5">
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">2. Formato</p>
+                  <div className="flex gap-2">
+                    {(["carrossel", "reel"] as const).map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setTipo(t)}
+                        className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
+                          tipo === t ? "bg-[#0C447C] text-white" : "border border-border hover:bg-secondary"
+                        }`}
+                      >
+                        {t === "carrossel" ? "🖼 Carrossel" : "🎬 Reel"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">3. Tom</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    {TONS_CONTEUDO.map(({ valor, label, desc }) => (
+                      <button
+                        key={valor}
+                        onClick={() => setTom(valor)}
+                        className={`text-left p-3 rounded-xl border transition-colors ${
+                          tom === valor
+                            ? "border-[#0C447C] bg-[#0C447C]/5 text-[#0C447C]"
+                            : "border-border hover:bg-secondary"
+                        }`}
+                      >
+                        <p className="text-sm font-medium">{label}</p>
+                        <p className="text-xs text-muted-foreground">{desc}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleGerar}
+                  disabled={!tom || loading}
+                  className="w-full h-12 rounded-xl bg-[#0C447C] hover:bg-[#185FA5] text-white font-medium flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
+                >
+                  {loading ? (
+                    <><Loader2 className="h-4 w-4 animate-spin" /><span className="text-sm">{loadingMsg}</span></>
+                  ) : (
+                    <><Wand2 className="h-4 w-4" /> Gerar com IA</>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* ── Etapa 3: Resultado ── */}
+        {etapa === "resultado" && resultado && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={voltarParaNarrativa}
+                className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1 transition-colors"
+              >
+                <ChevronLeft className="h-4 w-4" /> Escolher outro ângulo
+              </button>
               <div className="flex gap-2">
-                <Button size="sm" variant="outline" onClick={handleGerar} className="gap-1.5">
+                <button
+                  onClick={handleGerar}
+                  disabled={loading}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-sm hover:bg-secondary transition-colors disabled:opacity-50"
+                >
                   <RefreshCw className="h-3.5 w-3.5" /> Gerar variação
-                </Button>
-                <a href="/biblioteca" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-sm font-medium hover:bg-secondary transition-colors">
+                </button>
+                <a href="/biblioteca" className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-border text-sm hover:bg-secondary transition-colors">
                   <BookOpen className="h-3.5 w-3.5" /> Biblioteca
                 </a>
               </div>
             </div>
 
-            {tipo === "carrossel" ? (
+            {loading ? (
+              <div className="space-y-4">
+                <div className="flex items-center gap-3">
+                  <Loader2 className="h-5 w-5 text-[#0C447C] animate-spin" />
+                  <p className="text-sm font-medium text-[#0C447C] animate-pulse">{loadingMsg}</p>
+                </div>
+                <Skeleton className="h-16 rounded-lg" />
+                <Skeleton className="h-48 rounded-xl" />
+                <Skeleton className="h-28 rounded-xl" />
+              </div>
+            ) : tipo === "carrossel" ? (
               <PreviewCarrossel conteudo={resultado.conteudo as Parameters<typeof PreviewCarrossel>[0]["conteudo"]} />
             ) : (
               <PreviewReel conteudo={resultado.conteudo as Parameters<typeof PreviewReel>[0]["conteudo"]} />
             )}
           </div>
         )}
-      </main>
+
+      </div>
 
       <UpgradeModal
         aberto={upgradeMotivo !== null}
