@@ -18,8 +18,8 @@ import { useRouter } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 
 const NAV = [
-  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/gerar", label: "Gerar conteúdo", icon: Wand2 },
+  { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
   { href: "/biblioteca", label: "Biblioteca", icon: BookOpen },
   { href: "/kanban", label: "Kanban", icon: Kanban },
   { href: "/calendario", label: "Calendário", icon: CalendarDays },
