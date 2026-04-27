@@ -77,7 +77,7 @@ export default function UpgradeModal({ aberto, onFechar, motivo = "cota" }: Prop
             <ul className="text-xs text-muted-foreground mt-3 space-y-1.5 flex-1">
               <li>✓ 60 roteiros/mês</li>
               <li>✓ Roteiro de carrossel</li>
-              <li>✓ Roteiro de reels</li>
+              <li className="text-[#78716C]">✗ Roteiro de reels</li>
               <li className="text-[#78716C]">✗ Carrossel com imagem</li>
             </ul>
             <button

@@ -67,7 +67,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Trial expirado", code: "EXPIRED" }, { status: 403 });
     }
 
-    // restrição de plano: mensal não gera carrossel completo (com imagem)
+    // mensal (R$97): apenas roteiro de carrossel — sem reels, sem carrossel com imagem
+    if (sub.plano === "mensal" && tipo === "reel") {
+      return NextResponse.json({ error: "Roteiro de reels requer o plano Plus", code: "PLAN_UPGRADE_NEEDED" }, { status: 403 });
+    }
     if (sub.plano === "mensal" && tipo === "carrossel" && comImagem === true) {
       return NextResponse.json({ error: "Carrossel completo requer o plano Plus", code: "PLAN_UPGRADE_NEEDED" }, { status: 403 });
     }

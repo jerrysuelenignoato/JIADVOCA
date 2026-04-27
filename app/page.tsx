@@ -82,7 +82,7 @@ const FAQ = [
   },
   {
     p: "Qual a diferença entre os planos Reel e Completo?",
-    r: "O plano Reel (R$97) gera roteiros e scripts para Reels. O plano Completo (R$127) inclui tudo isso mais a criação de carrosséis prontos para o Instagram.",
+    r: "O plano Roteiro (R$97) gera roteiros de carrossel. O plano Plus (R$127) inclui também roteiros de reels e carrosséis completos com imagem.",
   },
   {
     p: "Quantos posts consigo gerar por mês?",
@@ -248,7 +248,6 @@ export default function HomePage() {
                     "7 dias grátis",
                     "60 roteiros/mês",
                     "Roteiro de carrossel",
-                    "Roteiro de reels",
                     "Biblioteca e Kanban",
                     "Calendário editorial",
                     "Suporte por email",
@@ -258,6 +257,10 @@ export default function HomePage() {
                       {f}
                     </li>
                   ))}
+                  <li className="flex items-center gap-2.5 text-sm text-muted-foreground/60">
+                    <span className="h-4 w-4 shrink-0 text-center leading-none">✗</span>
+                    Roteiro de reels
+                  </li>
                   <li className="flex items-center gap-2.5 text-sm text-muted-foreground/60">
                     <span className="h-4 w-4 shrink-0 text-center leading-none">✗</span>
                     Carrossel completo com imagem
