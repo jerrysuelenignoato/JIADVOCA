@@ -260,7 +260,7 @@ export default function HomePage() {
                   ))}
                   <li className="flex items-center gap-2.5 text-sm text-muted-foreground/60">
                     <span className="h-4 w-4 shrink-0 text-center leading-none">✗</span>
-                    Carrossel completo com foto
+                    Carrossel completo com imagem
                   </li>
                 </ul>
                 <Link
@@ -296,7 +296,7 @@ export default function HomePage() {
                   ))}
                   <li className="flex items-center gap-2.5 text-sm text-[#0F6E56] font-medium">
                     <CheckCircle2 className="h-4 w-4 text-[#0F6E56] shrink-0" />
-                    Carrossel completo com foto
+                    Carrossel completo com imagem
                   </li>
                 </ul>
                 <Link

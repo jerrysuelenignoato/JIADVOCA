@@ -78,7 +78,7 @@ export default function UpgradeModal({ aberto, onFechar, motivo = "cota" }: Prop
               <li>✓ 60 roteiros/mês</li>
               <li>✓ Roteiro de carrossel</li>
               <li>✓ Roteiro de reels</li>
-              <li className="text-[#78716C]">✗ Carrossel com foto</li>
+              <li className="text-[#78716C]">✗ Carrossel com imagem</li>
             </ul>
             <button
               onClick={() => checkout("mensal")}
@@ -106,7 +106,7 @@ export default function UpgradeModal({ aberto, onFechar, motivo = "cota" }: Prop
               <li>✓ 60 gerações/mês</li>
               <li>✓ Roteiro de carrossel</li>
               <li>✓ Roteiro de reels</li>
-              <li className="text-[#0F6E56] font-medium">✓ Carrossel completo com foto</li>
+              <li className="text-[#0F6E56] font-medium">✓ Carrossel completo com imagem</li>
             </ul>
             <button
               onClick={() => checkout("mensal_plus")}

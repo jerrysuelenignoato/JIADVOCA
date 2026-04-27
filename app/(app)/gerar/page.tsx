@@ -118,7 +118,7 @@ export default function GerarPage() {
                 >
                   <span className="text-xl">🖼</span>
                   <p className={`text-xs font-semibold mt-1.5 ${tipo === "carrossel" && comImagem ? "text-[#0F6E56]" : ""}`}>Carrossel completo</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">Slides com foto real</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">Slides com imagem real</p>
                 </button>
                 <button
                   onClick={() => { setTipo("reel"); setComImagem(false); }}
