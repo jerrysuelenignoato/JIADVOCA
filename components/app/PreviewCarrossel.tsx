@@ -3,6 +3,7 @@
 import { useState, useRef } from "react";
 import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw, Upload, SlidersHorizontal, X, Download, Sparkles } from "lucide-react";
 import { toast } from "sonner";
+import IAImageModal from "@/components/app/IAImageModal";
 
 type Slide = {
   numero: number;
@@ -70,6 +71,7 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
   const [adjusting, setAdjusting] = useState(false);
   const [baixando, setBaixando] = useState(false);
   const [gerandoIA, setGerandoIA] = useState(false);
+  const [iaModalAberto, setIAModalAberto] = useState(false);
   const uploadRef = useRef<HTMLInputElement>(null);
   const slideRef = useRef<HTMLDivElement>(null);
 
@@ -125,6 +127,7 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
   async function gerarComIA() {
     setGerandoIA(true);
     setAdjusting(false);
+    setIAModalAberto(false);
     try {
       const res = await fetch("/api/generate-image", {
         method: "POST",
@@ -138,8 +141,8 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
         );
         setAdjustments((prev) => ({ ...prev, [idx]: DEFAULT_ADJUST }));
         toast.success("Imagem gerada com IA!");
-      } else if (data.code === "PLAN_UPGRADE_NEEDED") {
-        toast.error("Requer plano Plus ou Anual");
+      } else if (data.code === "NO_IA_CREDITS") {
+        setIAModalAberto(true);
       } else {
         toast.error("Erro ao gerar imagem com IA");
       }
@@ -301,7 +304,7 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
                 </button>
               )}
               <button
-                onClick={gerarComIA}
+                onClick={() => setIAModalAberto(true)}
                 disabled={gerandoIA}
                 title="Gerar fundo com IA"
                 className="w-9 h-9 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-50"
@@ -415,6 +418,12 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
           <CopyBtn text={conteudo.cta_sugerido} />
         </div>
       )}
+      <IAImageModal
+        aberto={iaModalAberto}
+        onFechar={() => setIAModalAberto(false)}
+        onConfirmar={gerarComIA}
+        gerando={gerandoIA}
+      />
     </div>
   );
 }

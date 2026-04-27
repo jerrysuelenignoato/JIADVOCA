@@ -7,27 +7,35 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Não autenticado" }, { status: 401 });
 
-  // apenas planos que incluem carrossel com imagem
-  const { data: sub } = await supabase
-    .from("subscriptions")
-    .select("plano")
+  // verificar e debitar crédito
+  const { data: credRow } = await supabase
+    .from("ia_credits")
+    .select("saldo")
     .eq("user_id", user.id)
-    .eq("status", "ativa")
-    .order("created_at", { ascending: false })
-    .limit(1)
     .single();
 
-  if (!sub || sub.plano === "mensal") {
-    return NextResponse.json({ error: "Requer plano Plus ou Anual", code: "PLAN_UPGRADE_NEEDED" }, { status: 403 });
+  const saldo = credRow?.saldo ?? 0;
+  if (saldo <= 0) {
+    return NextResponse.json({ error: "Sem créditos de IA", code: "NO_IA_CREDITS" }, { status: 402 });
   }
+
+  // debitar antes de gerar (evita uso duplo em falhas de rede)
+  await supabase
+    .from("ia_credits")
+    .update({ saldo: saldo - 1, updated_at: new Date().toISOString() })
+    .eq("user_id", user.id);
 
   const { titulo, tema } = await req.json();
-  if (!titulo && !tema) {
-    return NextResponse.json({ error: "titulo ou tema obrigatório" }, { status: 400 });
+  const url = await gerarImagemIA(titulo ?? "", tema ?? "");
+
+  if (!url) {
+    // estornar crédito se a geração falhou
+    await supabase
+      .from("ia_credits")
+      .update({ saldo, updated_at: new Date().toISOString() })
+      .eq("user_id", user.id);
+    return NextResponse.json({ error: "Falha ao gerar imagem" }, { status: 500 });
   }
 
-  const url = await gerarImagemIA(titulo ?? "", tema ?? "");
-  if (!url) return NextResponse.json({ error: "Falha ao gerar imagem" }, { status: 500 });
-
-  return NextResponse.json({ url });
+  return NextResponse.json({ url, saldoRestante: saldo - 1 });
 }

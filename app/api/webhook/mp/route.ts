@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import crypto from "crypto";
 import { MercadoPagoConfig, Payment, PreApproval } from "mercadopago";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { PACKS_IA } from "@/lib/mercadopago";
 
 const mpClient = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN!,
@@ -87,10 +88,39 @@ export async function POST(req: NextRequest) {
       }
 
       const extRef = pagamento.external_reference ?? "";
-      const [userId, plano] = extRef.split("|");
+      const [userId, ref] = extRef.split("|");
 
-      if (!userId || plano !== "anual") {
+      if (!userId) {
         console.warn("[webhook/mp] external_reference inválido:", extRef);
+        return NextResponse.json({ received: true });
+      }
+
+      // créditos de IA
+      if (ref && ref in PACKS_IA) {
+        const pack = PACKS_IA[ref as keyof typeof PACKS_IA];
+        const supabase = createAdminClient();
+        const { data: atual } = await supabase
+          .from("ia_credits")
+          .select("saldo")
+          .eq("user_id", userId)
+          .single();
+
+        if (atual) {
+          await supabase
+            .from("ia_credits")
+            .update({ saldo: atual.saldo + pack.creditos, updated_at: new Date().toISOString() })
+            .eq("user_id", userId);
+        } else {
+          await supabase
+            .from("ia_credits")
+            .insert({ user_id: userId, saldo: pack.creditos });
+        }
+        return NextResponse.json({ received: true });
+      }
+
+      // plano anual
+      if (ref !== "anual") {
+        console.warn("[webhook/mp] ref desconhecido:", extRef);
         return NextResponse.json({ received: true });
       }
 
