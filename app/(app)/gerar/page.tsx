@@ -91,6 +91,50 @@ export default function GerarPage() {
         {/* ── Etapa 1: Tema ── */}
         {etapa === "tema" && (
           <div className="space-y-8">
+
+            {/* Seletor de formato */}
+            <div>
+              <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">O que gerar</p>
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  onClick={() => { setTipo("reel"); setComImagem(false); }}
+                  className={`text-left p-3 rounded-xl border-2 transition-all ${
+                    tipo === "reel"
+                      ? "border-[#0C447C] bg-[#0C447C]/5"
+                      : "border-border bg-white hover:border-[#0C447C]/30"
+                  }`}
+                >
+                  <span className="text-xl">📝</span>
+                  <p className={`text-xs font-semibold mt-1.5 ${tipo === "reel" ? "text-[#0C447C]" : ""}`}>Só roteiro</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">Script completo para gravar</p>
+                </button>
+                <button
+                  onClick={() => { setTipo("carrossel"); setComImagem(false); }}
+                  className={`text-left p-3 rounded-xl border-2 transition-all ${
+                    tipo === "carrossel" && !comImagem
+                      ? "border-[#0C447C] bg-[#0C447C]/5"
+                      : "border-border bg-white hover:border-[#0C447C]/30"
+                  }`}
+                >
+                  <span className="text-xl">🖼</span>
+                  <p className={`text-xs font-semibold mt-1.5 ${tipo === "carrossel" && !comImagem ? "text-[#0C447C]" : ""}`}>Carrossel</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">Slides prontos sem foto</p>
+                </button>
+                <button
+                  onClick={() => { setTipo("carrossel"); setComImagem(true); }}
+                  className={`text-left p-3 rounded-xl border-2 transition-all ${
+                    tipo === "carrossel" && comImagem
+                      ? "border-[#0F6E56] bg-[#0F6E56]/5"
+                      : "border-border bg-white hover:border-[#0F6E56]/30"
+                  }`}
+                >
+                  <span className="text-xl">📸</span>
+                  <p className={`text-xs font-semibold mt-1.5 ${tipo === "carrossel" && comImagem ? "text-[#0F6E56]" : ""}`}>Com imagem</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">Slides com foto real</p>
+                </button>
+              </div>
+            </div>
+
             <div className="text-center space-y-1">
               <h1 className="text-2xl font-semibold text-[#1C1917]">O que você quer criar hoje?</h1>
               <p className="text-sm text-muted-foreground">Digite um tema ou escolha uma sugestão</p>
@@ -186,66 +230,7 @@ export default function GerarPage() {
             {narrativaIdx !== null && !loadingNarrativas && (
               <div className="bg-white border border-border rounded-2xl p-5 space-y-5">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">2. O que gerar</p>
-                  <div className="grid grid-cols-3 gap-2">
-                    {/* Só Roteiro */}
-                    <button
-                      onClick={() => { setTipo("reel"); setComImagem(false); }}
-                      className={`text-left p-3 rounded-xl border-2 transition-all ${
-                        tipo === "reel"
-                          ? "border-[#0C447C] bg-[#0C447C]/5"
-                          : "border-border hover:border-[#0C447C]/30"
-                      }`}
-                    >
-                      <span className="text-xl">📝</span>
-                      <p className={`text-xs font-semibold mt-1.5 ${tipo === "reel" ? "text-[#0C447C]" : ""}`}>
-                        Só roteiro
-                      </p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
-                        Script completo para gravar
-                      </p>
-                    </button>
-
-                    {/* Carrossel sem imagem */}
-                    <button
-                      onClick={() => { setTipo("carrossel"); setComImagem(false); }}
-                      className={`text-left p-3 rounded-xl border-2 transition-all ${
-                        tipo === "carrossel" && !comImagem
-                          ? "border-[#0C447C] bg-[#0C447C]/5"
-                          : "border-border hover:border-[#0C447C]/30"
-                      }`}
-                    >
-                      <span className="text-xl">🖼</span>
-                      <p className={`text-xs font-semibold mt-1.5 ${tipo === "carrossel" && !comImagem ? "text-[#0C447C]" : ""}`}>
-                        Carrossel
-                      </p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
-                        Slides prontos sem foto
-                      </p>
-                    </button>
-
-                    {/* Carrossel com imagem */}
-                    <button
-                      onClick={() => { setTipo("carrossel"); setComImagem(true); }}
-                      className={`text-left p-3 rounded-xl border-2 transition-all ${
-                        tipo === "carrossel" && comImagem
-                          ? "border-[#0F6E56] bg-[#0F6E56]/5"
-                          : "border-border hover:border-[#0F6E56]/30"
-                      }`}
-                    >
-                      <span className="text-xl">📸</span>
-                      <p className={`text-xs font-semibold mt-1.5 ${tipo === "carrossel" && comImagem ? "text-[#0F6E56]" : ""}`}>
-                        Com imagem
-                      </p>
-                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
-                        Slides com foto real
-                      </p>
-                    </button>
-                  </div>
-                </div>
-
-                <div>
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">3. Tom</p>
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">2. Tom</p>
                   <div className="grid grid-cols-2 gap-2">
                     {TONS_CONTEUDO.map(({ valor, label, desc }) => (
                       <button
