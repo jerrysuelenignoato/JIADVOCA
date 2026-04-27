@@ -103,10 +103,25 @@ export async function POST(req: NextRequest) {
     if (tipo === "carrossel" && comImagem !== false) {
       const slideList = conteudo.slides as Array<Record<string, unknown>> | undefined;
       if (slideList && process.env.UNSPLASH_ACCESS_KEY) {
+        const FALLBACKS = [
+          "law books shelf wood",
+          "courthouse marble columns",
+          "justice scales desk",
+          "legal documents folder",
+          "gavel wooden desk",
+          "contract signing pen",
+          "library books law",
+        ];
+        let fallbackIdx = 0;
         await Promise.all(
           slideList.map(async (slide) => {
             const query = (slide.imagem_query ?? slide.imagem_prompt) as string | undefined;
-            if (query) slide.imagem_url = await buscarImagemUnsplash(query);
+            let url = query ? await buscarImagemUnsplash(query) : null;
+            if (!url) {
+              url = await buscarImagemUnsplash(FALLBACKS[fallbackIdx % FALLBACKS.length]);
+              fallbackIdx++;
+            }
+            if (url) slide.imagem_url = url;
           })
         );
       }
