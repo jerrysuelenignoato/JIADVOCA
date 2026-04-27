@@ -16,6 +16,7 @@ export type ConfigGeracao = {
   slides?: number;
   duracao?: number;
   extra?: string;
+  comImagem?: boolean;
 };
 
 const LOADING_MSGS = [

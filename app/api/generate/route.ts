@@ -30,6 +30,7 @@ const bodySchema = z.object({
   slides: z.number().int().min(3).max(10).optional(),
   duracao: z.number().int().optional(),
   extra: z.string().max(500).optional(),
+  comImagem: z.boolean().optional(),
 });
 
 export async function POST(req: NextRequest) {
@@ -43,7 +44,7 @@ export async function POST(req: NextRequest) {
     if (!parsed.success) {
       return NextResponse.json({ error: "Dados inválidos" }, { status: 400 });
     }
-    const { tipo, area, tom, slides, duracao, extra } = parsed.data;
+    const { tipo, area, tom, slides, duracao, extra, comImagem } = parsed.data;
 
     // verificar assinatura ativa
     const { data: sub } = await supabase
@@ -98,8 +99,8 @@ export async function POST(req: NextRequest) {
 
     const conteudo = await gerarConteudo(SYSTEM_PROMPT, userPrompt);
 
-    // buscar imagens Unsplash para cada slide do carrossel
-    if (tipo === "carrossel") {
+    // buscar imagens Unsplash para cada slide do carrossel (apenas quando solicitado)
+    if (tipo === "carrossel" && comImagem !== false) {
       const slideList = conteudo.slides as Array<Record<string, unknown>> | undefined;
       if (slideList && process.env.UNSPLASH_ACCESS_KEY) {
         await Promise.all(

@@ -23,7 +23,8 @@ export default function GerarPage() {
   const [narrativas, setNarrativas] = useState<Narrativa[]>([]);
   const [narrativaIdx, setNarrativaIdx] = useState<number | null>(null);
   const [loadingNarrativas, setLoadingNarrativas] = useState(false);
-  const [tipo, setTipo] = useState<"carrossel" | "reel">("carrossel");
+  const [tipo, setTipo] = useState<"carrossel" | "reel">("reel");
+  const [comImagem, setComImagem] = useState(false);
   const [tom, setTom] = useState("");
 
   useEffect(() => {
@@ -68,6 +69,7 @@ export default function GerarPage() {
       slides: tipo === "carrossel" ? 7 : undefined,
       duracao: tipo === "reel" ? 60 : undefined,
       extra: `Ângulo narrativo escolhido: "${narrativa.titulo}". ${narrativa.descricao}`,
+      comImagem,
     });
   }
 
@@ -185,19 +187,61 @@ export default function GerarPage() {
             {narrativaIdx !== null && !loadingNarrativas && (
               <div className="bg-white border border-border rounded-2xl p-5 space-y-5">
                 <div>
-                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">2. Formato</p>
-                  <div className="flex gap-2">
-                    {(["carrossel", "reel"] as const).map((t) => (
-                      <button
-                        key={t}
-                        onClick={() => setTipo(t)}
-                        className={`flex-1 py-2.5 rounded-xl text-sm font-medium transition-colors ${
-                          tipo === t ? "bg-[#0C447C] text-white" : "border border-border hover:bg-secondary"
-                        }`}
-                      >
-                        {t === "carrossel" ? "🖼 Carrossel" : "🎬 Reel"}
-                      </button>
-                    ))}
+                  <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">2. O que gerar</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {/* Só Roteiro */}
+                    <button
+                      onClick={() => { setTipo("reel"); setComImagem(false); }}
+                      className={`text-left p-3 rounded-xl border-2 transition-all ${
+                        tipo === "reel"
+                          ? "border-[#0C447C] bg-[#0C447C]/5"
+                          : "border-border hover:border-[#0C447C]/30"
+                      }`}
+                    >
+                      <span className="text-xl">📝</span>
+                      <p className={`text-xs font-semibold mt-1.5 ${tipo === "reel" ? "text-[#0C447C]" : ""}`}>
+                        Só roteiro
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
+                        Script completo para gravar
+                      </p>
+                    </button>
+
+                    {/* Carrossel sem imagem */}
+                    <button
+                      onClick={() => { setTipo("carrossel"); setComImagem(false); }}
+                      className={`text-left p-3 rounded-xl border-2 transition-all ${
+                        tipo === "carrossel" && !comImagem
+                          ? "border-[#0C447C] bg-[#0C447C]/5"
+                          : "border-border hover:border-[#0C447C]/30"
+                      }`}
+                    >
+                      <span className="text-xl">🖼</span>
+                      <p className={`text-xs font-semibold mt-1.5 ${tipo === "carrossel" && !comImagem ? "text-[#0C447C]" : ""}`}>
+                        Carrossel
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
+                        Slides prontos sem foto
+                      </p>
+                    </button>
+
+                    {/* Carrossel com imagem */}
+                    <button
+                      onClick={() => { setTipo("carrossel"); setComImagem(true); }}
+                      className={`text-left p-3 rounded-xl border-2 transition-all ${
+                        tipo === "carrossel" && comImagem
+                          ? "border-[#0F6E56] bg-[#0F6E56]/5"
+                          : "border-border hover:border-[#0F6E56]/30"
+                      }`}
+                    >
+                      <span className="text-xl">📸</span>
+                      <p className={`text-xs font-semibold mt-1.5 ${tipo === "carrossel" && comImagem ? "text-[#0F6E56]" : ""}`}>
+                        Com imagem
+                      </p>
+                      <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">
+                        Slides com foto real
+                      </p>
+                    </button>
                   </div>
                 </div>
 
