@@ -128,8 +128,9 @@ export default function PreviewCarrossel({ conteudo }: Props) {
             {/* slide visual */}
             <div
               className="relative w-full overflow-hidden flex flex-col"
-              style={{ aspectRatio: "1 / 1", maxHeight: "320px" }}
               style={{
+                aspectRatio: "1 / 1",
+                maxHeight: "320px",
                 background: bg,
                 ...(slide?.imagem_url && {
                   backgroundImage: `url(${slide.imagem_url})`,
