@@ -136,8 +136,8 @@ export default function GerarPage() {
             </div>
 
             <div className="text-center space-y-1">
-              <h1 className="text-2xl font-semibold text-[#1C1917]">O que você quer criar hoje?</h1>
-              <p className="text-sm text-muted-foreground">Digite um tema ou escolha uma sugestão</p>
+              <h1 className="text-3xl font-serif font-semibold tracking-tight text-[#1C1917]">O que você quer criar hoje?</h1>
+              <p className="text-sm text-muted-foreground tracking-wide">Digite um tema ou escolha uma sugestão</p>
             </div>
 
             <div className="relative">
