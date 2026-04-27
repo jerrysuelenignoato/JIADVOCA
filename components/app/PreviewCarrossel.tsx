@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw, Upload, SlidersHorizontal, X } from "lucide-react";
+import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw, Upload, SlidersHorizontal, X, Download } from "lucide-react";
 import { toast } from "sonner";
 
 type Slide = {
@@ -67,7 +67,9 @@ export default function PreviewCarrossel({ conteudo }: Props) {
   const [trocando, setTrocando] = useState(false);
   const [adjustments, setAdjustments] = useState<Record<number, ImageAdjust>>({});
   const [adjusting, setAdjusting] = useState(false);
+  const [baixando, setBaixando] = useState(false);
   const uploadRef = useRef<HTMLInputElement>(null);
+  const slideRef = useRef<HTMLDivElement>(null);
 
   const slide = slides[idx];
   const bgIdx = (slide?.numero ?? 1) - 1;
@@ -118,6 +120,29 @@ export default function PreviewCarrossel({ conteudo }: Props) {
     }));
   }
 
+  async function baixarSlide() {
+    if (!slideRef.current) return;
+    setBaixando(true);
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const canvas = await html2canvas(slideRef.current, {
+        useCORS: true,
+        allowTaint: false,
+        scale: 3,
+        backgroundColor: null,
+        logging: false,
+      });
+      const link = document.createElement("a");
+      link.download = `slide-${(slide?.numero ?? idx + 1)}-jiadvoca.png`;
+      link.href = canvas.toDataURL("image/png");
+      link.click();
+    } catch {
+      toast.error("Erro ao baixar imagem");
+    } finally {
+      setBaixando(false);
+    }
+  }
+
   return (
     <div className="space-y-4">
       {/* headline */}
@@ -146,6 +171,7 @@ export default function PreviewCarrossel({ conteudo }: Props) {
 
             {/* slide visual — fixed square capped at 360px */}
             <div
+              ref={slideRef}
               className="relative w-full overflow-hidden flex flex-col"
               style={{
                 aspectRatio: "1 / 1",
@@ -244,6 +270,14 @@ export default function PreviewCarrossel({ conteudo }: Props) {
                   <SlidersHorizontal className="h-4 w-4" />
                 </button>
               )}
+              <button
+                onClick={baixarSlide}
+                disabled={baixando}
+                title="Baixar slide"
+                className="w-9 h-9 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-50"
+              >
+                <Download className={`h-4 w-4 text-muted-foreground ${baixando ? "animate-bounce" : ""}`} />
+              </button>
             </div>
           </div>
 
