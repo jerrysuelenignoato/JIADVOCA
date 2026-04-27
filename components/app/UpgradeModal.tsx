@@ -70,15 +70,15 @@ export default function UpgradeModal({ aberto, onFechar, motivo = "cota" }: Prop
         <div className="grid grid-cols-3 gap-3">
           {/* Reel */}
           <div className="border border-border rounded-xl p-4 flex flex-col">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Reel</p>
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Roteiro</p>
             <p className="text-xl font-bold mt-1">
               R$97<span className="text-xs font-normal text-muted-foreground">/mês</span>
             </p>
             <ul className="text-xs text-muted-foreground mt-3 space-y-1.5 flex-1">
               <li>✓ 60 roteiros/mês</li>
-              <li>✓ Reels completos</li>
-              <li>✓ Biblioteca e Kanban</li>
-              <li className="text-[#78716C]">✗ Carrosséis</li>
+              <li>✓ Roteiro de carrossel</li>
+              <li>✓ Roteiro de reels</li>
+              <li className="text-[#78716C]">✗ Carrossel com foto</li>
             </ul>
             <button
               onClick={() => checkout("mensal")}
@@ -98,15 +98,15 @@ export default function UpgradeModal({ aberto, onFechar, motivo = "cota" }: Prop
             <span className="absolute -top-2.5 left-1/2 -translate-x-1/2 bg-[#0C447C] text-white text-[10px] px-2 py-0.5 rounded-full whitespace-nowrap font-semibold">
               Mais popular
             </span>
-            <p className="text-xs font-semibold text-[#0C447C] uppercase tracking-wide">Completo</p>
+            <p className="text-xs font-semibold text-[#0C447C] uppercase tracking-wide">Plus</p>
             <p className="text-xl font-bold mt-1 text-[#0C447C]">
               R$127<span className="text-xs font-normal text-muted-foreground">/mês</span>
             </p>
             <ul className="text-xs text-muted-foreground mt-3 space-y-1.5 flex-1">
               <li>✓ 60 gerações/mês</li>
-              <li>✓ Reels completos</li>
-              <li className="text-[#0F6E56] font-medium">✓ Carrosséis prontos</li>
-              <li>✓ Biblioteca e Kanban</li>
+              <li>✓ Roteiro de carrossel</li>
+              <li>✓ Roteiro de reels</li>
+              <li className="text-[#0F6E56] font-medium">✓ Carrossel completo com foto</li>
             </ul>
             <button
               onClick={() => checkout("mensal_plus")}

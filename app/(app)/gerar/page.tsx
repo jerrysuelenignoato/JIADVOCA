@@ -97,18 +97,6 @@ export default function GerarPage() {
               <p className="text-xs uppercase tracking-wide text-muted-foreground mb-3">O que gerar</p>
               <div className="grid grid-cols-3 gap-2">
                 <button
-                  onClick={() => { setTipo("reel"); setComImagem(false); }}
-                  className={`text-left p-3 rounded-xl border-2 transition-all ${
-                    tipo === "reel"
-                      ? "border-[#0C447C] bg-[#0C447C]/5"
-                      : "border-border bg-white hover:border-[#0C447C]/30"
-                  }`}
-                >
-                  <span className="text-xl">📝</span>
-                  <p className={`text-xs font-semibold mt-1.5 ${tipo === "reel" ? "text-[#0C447C]" : ""}`}>Só roteiro</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">Script completo para gravar</p>
-                </button>
-                <button
                   onClick={() => { setTipo("carrossel"); setComImagem(false); }}
                   className={`text-left p-3 rounded-xl border-2 transition-all ${
                     tipo === "carrossel" && !comImagem
@@ -116,9 +104,9 @@ export default function GerarPage() {
                       : "border-border bg-white hover:border-[#0C447C]/30"
                   }`}
                 >
-                  <span className="text-xl">🖼</span>
-                  <p className={`text-xs font-semibold mt-1.5 ${tipo === "carrossel" && !comImagem ? "text-[#0C447C]" : ""}`}>Carrossel</p>
-                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">Slides prontos sem foto</p>
+                  <span className="text-xl">📝</span>
+                  <p className={`text-xs font-semibold mt-1.5 ${tipo === "carrossel" && !comImagem ? "text-[#0C447C]" : ""}`}>Roteiro de carrossel</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">Slides prontos, sem foto</p>
                 </button>
                 <button
                   onClick={() => { setTipo("carrossel"); setComImagem(true); }}
@@ -128,9 +116,21 @@ export default function GerarPage() {
                       : "border-border bg-white hover:border-[#0F6E56]/30"
                   }`}
                 >
-                  <span className="text-xl">📸</span>
-                  <p className={`text-xs font-semibold mt-1.5 ${tipo === "carrossel" && comImagem ? "text-[#0F6E56]" : ""}`}>Com imagem</p>
+                  <span className="text-xl">🖼</span>
+                  <p className={`text-xs font-semibold mt-1.5 ${tipo === "carrossel" && comImagem ? "text-[#0F6E56]" : ""}`}>Carrossel completo</p>
                   <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">Slides com foto real</p>
+                </button>
+                <button
+                  onClick={() => { setTipo("reel"); setComImagem(false); }}
+                  className={`text-left p-3 rounded-xl border-2 transition-all ${
+                    tipo === "reel"
+                      ? "border-[#0C447C] bg-[#0C447C]/5"
+                      : "border-border bg-white hover:border-[#0C447C]/30"
+                  }`}
+                >
+                  <span className="text-xl">🎬</span>
+                  <p className={`text-xs font-semibold mt-1.5 ${tipo === "reel" ? "text-[#0C447C]" : ""}`}>Roteiro de reels</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5 leading-snug">Script completo para gravar</p>
                 </button>
               </div>
             </div>

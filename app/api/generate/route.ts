@@ -67,9 +67,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Trial expirado", code: "EXPIRED" }, { status: 403 });
     }
 
-    // restrição de plano: mensal só gera reels
-    if (sub.plano === "mensal" && tipo === "carrossel") {
-      return NextResponse.json({ error: "Plano Reel não inclui carrosséis", code: "PLAN_UPGRADE_NEEDED" }, { status: 403 });
+    // restrição de plano: mensal não gera carrossel completo (com imagem)
+    if (sub.plano === "mensal" && tipo === "carrossel" && comImagem === true) {
+      return NextResponse.json({ error: "Carrossel completo requer o plano Plus", code: "PLAN_UPGRADE_NEEDED" }, { status: 403 });
     }
 
     // verificar cota do mês

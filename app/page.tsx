@@ -238,16 +238,17 @@ export default function HomePage() {
               <p className="mt-3 text-muted-foreground">Sem surpresas. Cancele quando quiser.</p>
             </div>
             <div className="grid sm:grid-cols-3 gap-6">
-              {/* reel */}
+              {/* roteiro */}
               <div className="bg-white rounded-2xl border border-border p-7 flex flex-col">
-                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Reel</p>
+                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Roteiro</p>
                 <p className="mt-3 text-4xl font-bold">R$97</p>
                 <p className="text-muted-foreground text-sm">por mês</p>
                 <ul className="mt-6 space-y-3 flex-1">
                   {[
                     "7 dias grátis",
                     "60 roteiros/mês",
-                    "Reels completos",
+                    "Roteiro de carrossel",
+                    "Roteiro de reels",
                     "Biblioteca e Kanban",
                     "Calendário editorial",
                     "Suporte por email",
@@ -259,7 +260,7 @@ export default function HomePage() {
                   ))}
                   <li className="flex items-center gap-2.5 text-sm text-muted-foreground/60">
                     <span className="h-4 w-4 shrink-0 text-center leading-none">✗</span>
-                    Carrosséis
+                    Carrossel completo com foto
                   </li>
                 </ul>
                 <Link
@@ -270,19 +271,20 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* completo */}
+              {/* plus */}
               <div className="bg-white rounded-2xl border-2 border-[#0C447C] p-7 flex flex-col relative">
                 <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0C447C] text-white text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
                   Mais popular
                 </span>
-                <p className="text-sm font-semibold text-[#0C447C] uppercase tracking-wide">Completo</p>
+                <p className="text-sm font-semibold text-[#0C447C] uppercase tracking-wide">Plus</p>
                 <p className="mt-3 text-4xl font-bold text-[#0C447C]">R$127</p>
                 <p className="text-muted-foreground text-sm">por mês</p>
                 <ul className="mt-6 space-y-3 flex-1">
                   {[
                     "7 dias grátis",
                     "60 gerações/mês",
-                    "Reels completos",
+                    "Roteiro de carrossel",
+                    "Roteiro de reels",
                     "Biblioteca e Kanban",
                     "Calendário editorial",
                     "Suporte por email",
@@ -294,7 +296,7 @@ export default function HomePage() {
                   ))}
                   <li className="flex items-center gap-2.5 text-sm text-[#0F6E56] font-medium">
                     <CheckCircle2 className="h-4 w-4 text-[#0F6E56] shrink-0" />
-                    Carrosséis prontos
+                    Carrossel completo com foto
                   </li>
                 </ul>
                 <Link
