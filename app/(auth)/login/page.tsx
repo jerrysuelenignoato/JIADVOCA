@@ -39,7 +39,7 @@ export default function LoginPage() {
         password: data.senha,
       });
       if (error) throw error;
-      router.push("/dashboard");
+      router.push("/gerar");
       router.refresh();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Erro ao entrar";

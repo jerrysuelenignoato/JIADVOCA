@@ -91,7 +91,7 @@ export default function CadastroPage() {
       });
       if (error) throw error;
       toast.success("Conta criada! Verifique seu email para confirmar.");
-      router.push("/dashboard");
+      router.push("/gerar");
       router.refresh();
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Erro ao criar conta";
