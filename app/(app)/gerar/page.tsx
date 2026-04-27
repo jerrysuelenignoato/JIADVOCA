@@ -16,10 +16,7 @@ export default function GerarPage() {
   const { gerar, loading, resultado, setResultado, loadingMsg, upgradeMotivo, fecharUpgrade } = useGerar();
 
   const [etapa, setEtapa] = useState<Etapa>("tema");
-  const [sugestoes, setSugestoes] = useState<string[]>(() => {
-    const shuffled = [...SUGESTOES_POOL].sort(() => Math.random() - 0.5);
-    return shuffled.slice(0, 8);
-  });
+  const [sugestoes, setSugestoes] = useState<string[]>([]);
   const [tema, setTema] = useState("");
   const [narrativas, setNarrativas] = useState<Narrativa[]>([]);
   const [narrativaIdx, setNarrativaIdx] = useState<number | null>(null);
@@ -31,6 +28,11 @@ export default function GerarPage() {
   useEffect(() => {
     if (resultado) setEtapa("resultado");
   }, [resultado]);
+
+  useEffect(() => {
+    const shuffled = [...SUGESTOES_POOL].sort(() => Math.random() - 0.5);
+    setSugestoes(shuffled.slice(0, 8));
+  }, []);
 
 
   async function buscarAngulos(temaOverride?: string) {
