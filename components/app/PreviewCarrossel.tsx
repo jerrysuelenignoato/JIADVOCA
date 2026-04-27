@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw, Upload } from "lucide-react";
+import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw, Upload, SlidersHorizontal, X } from "lucide-react";
 import { toast } from "sonner";
 
 type Slide = {
@@ -14,6 +14,8 @@ type Slide = {
   imagem_query?: string;
   imagem_prompt?: string;
 };
+
+type ImageAdjust = { x: number; y: number; scale: number };
 
 type Props = {
   conteudo: {
@@ -38,6 +40,8 @@ const BG_GRADIENTS = [
 
 const ACCENT_COLORS = ["#0F6E56", "#185FA5", "#D97706", "#0F6E56", "#185FA5", "#0F6E56", "#D97706"];
 
+const DEFAULT_ADJUST: ImageAdjust = { x: 50, y: 50, scale: 110 };
+
 function CopyBtn({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
   async function copy() {
@@ -61,15 +65,19 @@ export default function PreviewCarrossel({ conteudo }: Props) {
   const [slides, setSlides] = useState<Slide[]>(conteudo.slides ?? []);
   const [idx, setIdx] = useState(0);
   const [trocando, setTrocando] = useState(false);
+  const [adjustments, setAdjustments] = useState<Record<number, ImageAdjust>>({});
+  const [adjusting, setAdjusting] = useState(false);
   const uploadRef = useRef<HTMLInputElement>(null);
 
   const slide = slides[idx];
   const bgIdx = (slide?.numero ?? 1) - 1;
   const bg = BG_GRADIENTS[bgIdx % BG_GRADIENTS.length];
   const accent = ACCENT_COLORS[bgIdx % ACCENT_COLORS.length];
+  const adj = adjustments[idx] ?? DEFAULT_ADJUST;
 
   async function trocarImagem() {
     setTrocando(true);
+    setAdjusting(false);
     try {
       const query = slide?.imagem_query ?? slide?.imagem_prompt ?? "";
       const exclude = slide?.imagem_url ?? "";
@@ -80,6 +88,7 @@ export default function PreviewCarrossel({ conteudo }: Props) {
         setSlides((prev) =>
           prev.map((s, i) => (i === idx ? { ...s, imagem_url: data.url } : s))
         );
+        setAdjustments((prev) => ({ ...prev, [idx]: DEFAULT_ADJUST }));
       } else {
         toast.error("Não foi possível encontrar outra imagem");
       }
@@ -97,7 +106,16 @@ export default function PreviewCarrossel({ conteudo }: Props) {
     setSlides((prev) =>
       prev.map((s, i) => (i === idx ? { ...s, imagem_url: url } : s))
     );
+    setAdjustments((prev) => ({ ...prev, [idx]: DEFAULT_ADJUST }));
+    setAdjusting(true);
     e.target.value = "";
+  }
+
+  function setAdj(field: keyof ImageAdjust, value: number) {
+    setAdjustments((prev) => ({
+      ...prev,
+      [idx]: { ...(prev[idx] ?? DEFAULT_ADJUST), [field]: value },
+    }));
   }
 
   return (
@@ -125,17 +143,19 @@ export default function PreviewCarrossel({ conteudo }: Props) {
               className="hidden"
               onChange={handleUpload}
             />
-            {/* slide visual */}
+
+            {/* slide visual — fixed square capped at 360px */}
             <div
               className="relative w-full overflow-hidden flex flex-col"
               style={{
                 aspectRatio: "1 / 1",
-                maxHeight: "320px",
+                maxHeight: "360px",
                 background: bg,
                 ...(slide?.imagem_url && {
                   backgroundImage: `url(${slide.imagem_url})`,
-                  backgroundSize: "cover",
-                  backgroundPosition: "center",
+                  backgroundSize: `${adj.scale}%`,
+                  backgroundPosition: `${adj.x}% ${adj.y}%`,
+                  backgroundRepeat: "no-repeat",
                 }),
               }}
             >
@@ -211,21 +231,83 @@ export default function PreviewCarrossel({ conteudo }: Props) {
               >
                 <Upload className="h-4 w-4 text-muted-foreground" />
               </button>
+              {slide?.imagem_url && (
+                <button
+                  onClick={() => setAdjusting((v) => !v)}
+                  title="Ajustar imagem"
+                  className={`w-9 h-9 rounded-xl border shadow-sm flex items-center justify-center transition-colors ${
+                    adjusting
+                      ? "bg-[#0C447C] border-[#0C447C] text-white"
+                      : "bg-white border-border hover:bg-secondary text-muted-foreground"
+                  }`}
+                >
+                  <SlidersHorizontal className="h-4 w-4" />
+                </button>
+              )}
             </div>
           </div>
+
+          {/* painel de ajuste de imagem */}
+          {adjusting && slide?.imagem_url && (
+            <div className="border-t border-border bg-[#FAFAF9] px-4 py-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Ajustar imagem</p>
+                <button onClick={() => setAdjusting(false)} className="text-muted-foreground hover:text-foreground">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground w-10">Zoom</span>
+                  <input
+                    type="range" min={100} max={300} step={1}
+                    value={adj.scale}
+                    onChange={(e) => setAdj("scale", Number(e.target.value))}
+                    className="flex-1 accent-[#0C447C] h-1.5"
+                  />
+                  <span className="text-xs text-muted-foreground w-10 text-right">{adj.scale}%</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground w-10">Posição X</span>
+                  <input
+                    type="range" min={0} max={100} step={1}
+                    value={adj.x}
+                    onChange={(e) => setAdj("x", Number(e.target.value))}
+                    className="flex-1 accent-[#0C447C] h-1.5"
+                  />
+                  <span className="text-xs text-muted-foreground w-10 text-right">{adj.x}%</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground w-10">Posição Y</span>
+                  <input
+                    type="range" min={0} max={100} step={1}
+                    value={adj.y}
+                    onChange={(e) => setAdj("y", Number(e.target.value))}
+                    className="flex-1 accent-[#0C447C] h-1.5"
+                  />
+                  <span className="text-xs text-muted-foreground w-10 text-right">{adj.y}%</span>
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* navegação */}
           <div className="flex items-center justify-between px-4 py-2.5 border-t border-border bg-white">
             <button
-              onClick={() => setIdx((i) => Math.max(0, i - 1))}
+              onClick={() => { setIdx((i) => Math.max(0, i - 1)); setAdjusting(false); }}
               disabled={idx === 0}
               className="p-1 rounded hover:bg-secondary disabled:opacity-30 transition-colors"
             >
               <ChevronLeft className="h-4 w-4" />
             </button>
-            <span className="text-xs text-muted-foreground">{idx + 1} / {slides.length}</span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-muted-foreground">{idx + 1} / {slides.length}</span>
+              <span className="text-[10px] text-muted-foreground/50 border border-border rounded px-1.5 py-0.5 font-mono">
+                1080 × 1080
+              </span>
+            </div>
             <button
-              onClick={() => setIdx((i) => Math.min(slides.length - 1, i + 1))}
+              onClick={() => { setIdx((i) => Math.min(slides.length - 1, i + 1)); setAdjusting(false); }}
               disabled={idx === slides.length - 1}
               className="p-1 rounded hover:bg-secondary disabled:opacity-30 transition-colors"
             >
