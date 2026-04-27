@@ -82,7 +82,7 @@ const FAQ = [
   },
   {
     p: "Qual a diferença entre os planos Reel e Completo?",
-    r: "O plano Roteiro (R$97) gera roteiros de carrossel. O plano Plus (R$127) inclui também roteiros de reels e carrosséis completos com imagem.",
+    r: "O plano Roteiro (R$97) gera roteiros de carrossel e reels. O plano Plus (R$127) inclui também Biblioteca, Kanban, Calendário editorial e carrosséis com imagem real.",
   },
   {
     p: "Quantos posts consigo gerar por mês?",
@@ -248,8 +248,7 @@ export default function HomePage() {
                     "7 dias grátis",
                     "60 roteiros/mês",
                     "Roteiro de carrossel",
-                    "Biblioteca e Kanban",
-                    "Calendário editorial",
+                    "Roteiro de reels",
                     "Suporte por email",
                   ].map((f) => (
                     <li key={f} className="flex items-center gap-2.5 text-sm">
@@ -257,14 +256,12 @@ export default function HomePage() {
                       {f}
                     </li>
                   ))}
-                  <li className="flex items-center gap-2.5 text-sm text-muted-foreground/60">
-                    <span className="h-4 w-4 shrink-0 text-center leading-none">✗</span>
-                    Roteiro de reels
-                  </li>
-                  <li className="flex items-center gap-2.5 text-sm text-muted-foreground/60">
-                    <span className="h-4 w-4 shrink-0 text-center leading-none">✗</span>
-                    Carrossel completo com imagem
-                  </li>
+                  {["Biblioteca e Kanban", "Calendário editorial", "Carrossel completo com imagem"].map((f) => (
+                    <li key={f} className="flex items-center gap-2.5 text-sm text-muted-foreground/60">
+                      <span className="h-4 w-4 shrink-0 text-center leading-none">✗</span>
+                      {f}
+                    </li>
+                  ))}
                 </ul>
                 <Link
                   href="/cadastro"
@@ -288,8 +285,6 @@ export default function HomePage() {
                     "60 gerações/mês",
                     "Roteiro de carrossel",
                     "Roteiro de reels",
-                    "Biblioteca e Kanban",
-                    "Calendário editorial",
                     "Suporte por email",
                   ].map((f) => (
                     <li key={f} className="flex items-center gap-2.5 text-sm">
@@ -297,10 +292,12 @@ export default function HomePage() {
                       {f}
                     </li>
                   ))}
-                  <li className="flex items-center gap-2.5 text-sm text-[#0F6E56] font-medium">
-                    <CheckCircle2 className="h-4 w-4 text-[#0F6E56] shrink-0" />
-                    Carrossel completo com imagem
-                  </li>
+                  {["Biblioteca e Kanban", "Calendário editorial", "Carrossel completo com imagem"].map((f) => (
+                    <li key={f} className="flex items-center gap-2.5 text-sm text-[#0F6E56] font-medium">
+                      <CheckCircle2 className="h-4 w-4 text-[#0F6E56] shrink-0" />
+                      {f}
+                    </li>
+                  ))}
                 </ul>
                 <Link
                   href="/cadastro"

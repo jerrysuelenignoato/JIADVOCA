@@ -5,6 +5,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 import { Wand2, Search, Trash2, Copy, BookOpen } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
+import PlanoGate from "@/components/app/PlanoGate";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -89,6 +90,7 @@ export default function BibliotecaPage() {
   });
 
   return (
+    <PlanoGate recurso="Biblioteca">
     <div className="p-6 lg:p-8 max-w-6xl space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -209,5 +211,6 @@ export default function BibliotecaPage() {
         </div>
       )}
     </div>
+    </PlanoGate>
   );
 }

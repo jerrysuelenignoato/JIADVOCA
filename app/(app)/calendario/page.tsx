@@ -25,6 +25,7 @@ import { ptBR } from "date-fns/locale";
 import { createClient } from "@/lib/supabase/client";
 import { Dialog } from "@/components/ui/dialog";
 import Link from "next/link";
+import PlanoGate from "@/components/app/PlanoGate";
 
 type Agendado = {
   id: string;
@@ -122,6 +123,7 @@ export default function CalendarioPage() {
   const dias = eachDayOfInterval({ start: inicioGrade, end: fimGrade });
 
   return (
+    <PlanoGate recurso="Calendário editorial">
     <div className="p-6 lg:p-8 max-w-5xl space-y-4">
       {/* cabeçalho */}
       <div className="flex items-center justify-between">
@@ -294,5 +296,6 @@ export default function CalendarioPage() {
         </div>
       )}
     </div>
+    </PlanoGate>
   );
 }

@@ -67,12 +67,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Trial expirado", code: "EXPIRED" }, { status: 403 });
     }
 
-    // mensal (R$97): apenas roteiro de carrossel — sem reels, sem carrossel com imagem
-    if (sub.plano === "mensal" && tipo === "reel") {
-      return NextResponse.json({ error: "Roteiro de reels requer o plano Plus", code: "PLAN_UPGRADE_NEEDED" }, { status: 403 });
-    }
+    // mensal (R$97): sem carrossel com imagem
     if (sub.plano === "mensal" && tipo === "carrossel" && comImagem === true) {
       return NextResponse.json({ error: "Carrossel completo requer o plano Plus", code: "PLAN_UPGRADE_NEEDED" }, { status: 403 });
+    }
+
+    // trial: limite de 3 gerações por dia
+    if (sub.plano === "trial") {
+      const hoje = new Date().toISOString().split("T")[0];
+      const { count } = await supabase
+        .from("contents")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", user.id)
+        .gte("created_at", `${hoje}T00:00:00.000Z`)
+        .lte("created_at", `${hoje}T23:59:59.999Z`);
+      if ((count ?? 0) >= 3) {
+        return NextResponse.json({ error: "Limite de 3 roteiros por dia no trial", code: "DAILY_LIMIT_EXCEEDED" }, { status: 429 });
+      }
     }
 
     // verificar cota do mês

@@ -52,7 +52,7 @@ export function useGerar() {
       const data = await res.json();
 
       if (!res.ok) {
-        if (data.code === "QUOTA_EXCEEDED") {
+        if (data.code === "QUOTA_EXCEEDED" || data.code === "DAILY_LIMIT_EXCEEDED") {
           setUpgradeMotivo("cota");
         } else if (data.code === "EXPIRED") {
           setUpgradeMotivo("expirado");

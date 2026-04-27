@@ -19,6 +19,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { StatusConteudo } from "@/lib/utils";
+import PlanoGate from "@/components/app/PlanoGate";
 
 type Card = {
   id: string;
@@ -195,6 +196,7 @@ export default function KanbanPage() {
   }
 
   return (
+    <PlanoGate recurso="Kanban">
     <div className="p-6 lg:p-8 h-full flex flex-col">
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -234,5 +236,6 @@ export default function KanbanPage() {
         </div>
       )}
     </div>
+    </PlanoGate>
   );
 }
