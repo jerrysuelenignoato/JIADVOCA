@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, ChevronLeft, ChevronRight } from "lucide-react";
+import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 
 type Slide = {
@@ -11,6 +11,8 @@ type Slide = {
   subtitulo?: string;
   corpo?: string;
   imagem_url?: string;
+  imagem_query?: string;
+  imagem_prompt?: string;
 };
 
 type Props = {
@@ -56,13 +58,36 @@ function CopyBtn({ text }: { text: string }) {
 }
 
 export default function PreviewCarrossel({ conteudo }: Props) {
-  const slides = conteudo.slides ?? [];
+  const [slides, setSlides] = useState<Slide[]>(conteudo.slides ?? []);
   const [idx, setIdx] = useState(0);
-  const slide = slides[idx];
+  const [trocando, setTrocando] = useState(false);
 
+  const slide = slides[idx];
   const bgIdx = (slide?.numero ?? 1) - 1;
   const bg = BG_GRADIENTS[bgIdx % BG_GRADIENTS.length];
   const accent = ACCENT_COLORS[bgIdx % ACCENT_COLORS.length];
+
+  async function trocarImagem() {
+    setTrocando(true);
+    try {
+      const query = slide?.imagem_query ?? slide?.imagem_prompt ?? "";
+      const exclude = slide?.imagem_url ?? "";
+      const params = new URLSearchParams({ query, exclude });
+      const res = await fetch(`/api/unsplash?${params}`);
+      const data = await res.json();
+      if (data.url) {
+        setSlides((prev) =>
+          prev.map((s, i) => (i === idx ? { ...s, imagem_url: data.url } : s))
+        );
+      } else {
+        toast.error("Não foi possível encontrar outra imagem");
+      }
+    } catch {
+      toast.error("Erro ao buscar imagem");
+    } finally {
+      setTrocando(false);
+    }
+  }
 
   return (
     <div className="space-y-4">
@@ -77,79 +102,86 @@ export default function PreviewCarrossel({ conteudo }: Props) {
         </div>
       )}
 
-      {/* slide — formato 1:1 Instagram */}
+      {/* slide */}
       {slides.length > 0 && (
         <div className="border border-border rounded-xl overflow-hidden">
-          <div
-            className="relative w-full aspect-square overflow-hidden flex flex-col"
-            style={{
-              background: bg,
-              ...(slide?.imagem_url && {
-                backgroundImage: `url(${slide.imagem_url})`,
-                backgroundSize: "cover",
-                backgroundPosition: "center",
-              }),
-            }}
-          >
-            {/* overlay gradiente sobre a foto */}
-            <div className="absolute inset-0" style={{
-              background: slide?.imagem_url
-                ? "linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.80) 65%, rgba(0,0,0,0.92) 100%)"
-                : "linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 100%)",
-            }} />
+          <div className="relative">
+            {/* slide visual */}
+            <div
+              className="relative w-full aspect-square overflow-hidden flex flex-col"
+              style={{
+                background: bg,
+                ...(slide?.imagem_url && {
+                  backgroundImage: `url(${slide.imagem_url})`,
+                  backgroundSize: "cover",
+                  backgroundPosition: "center",
+                }),
+              }}
+            >
+              {/* overlay */}
+              <div className="absolute inset-0" style={{
+                background: slide?.imagem_url
+                  ? "linear-gradient(to bottom, rgba(0,0,0,0.12) 0%, rgba(0,0,0,0.22) 35%, rgba(0,0,0,0.80) 65%, rgba(0,0,0,0.92) 100%)"
+                  : "linear-gradient(135deg, rgba(0,0,0,0.15) 0%, rgba(0,0,0,0.05) 100%)",
+              }} />
 
-            {/* círculos decorativos (só sem foto) */}
-            {!slide?.imagem_url && <>
-              <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full"
-                style={{ background: "rgba(255,255,255,0.04)" }} />
-              <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full"
-                style={{ background: "rgba(255,255,255,0.03)" }} />
-            </>}
+              {/* círculos decorativos */}
+              {!slide?.imagem_url && <>
+                <div className="absolute -top-20 -right-20 w-72 h-72 rounded-full"
+                  style={{ background: "rgba(255,255,255,0.04)" }} />
+                <div className="absolute -bottom-16 -left-16 w-56 h-56 rounded-full"
+                  style={{ background: "rgba(255,255,255,0.03)" }} />
+              </>}
 
-            {/* conteúdo */}
-            <div className="relative z-10 flex flex-col h-full p-8">
-              {/* topo */}
-              <div className="flex items-center justify-between mb-auto">
-                <span className="text-white/40 text-[9px] tracking-[0.3em] uppercase font-medium">
-                  {slide?.tipo}
-                </span>
-                <span className="text-white/25 text-[9px] tracking-[0.2em] uppercase">
-                  JIADVOCA
-                </span>
-              </div>
+              {/* conteúdo */}
+              <div className="relative z-10 flex flex-col h-full p-8">
+                <div className="flex items-center justify-between mb-auto">
+                  <span className="text-white/40 text-[9px] tracking-[0.3em] uppercase font-medium">
+                    {slide?.tipo}
+                  </span>
+                  <span className="text-white/25 text-[9px] tracking-[0.2em] uppercase">
+                    JIADVOCA
+                  </span>
+                </div>
 
-              {/* título principal — domina o slide */}
-              <div className="flex-1 flex flex-col justify-center py-4">
-                {/* linha acento */}
-                <div className="w-10 h-[3px] rounded-full mb-5" style={{ background: accent }} />
+                <div className="flex-1 flex flex-col justify-center py-4">
+                  <div className="w-10 h-[3px] rounded-full mb-5" style={{ background: accent }} />
+                  {slide?.titulo && (
+                    <p
+                      className="text-white font-serif font-semibold leading-[1.08] tracking-tight"
+                      style={{ fontSize: "clamp(1.9rem, 6.5vw, 3.2rem)" }}
+                    >
+                      {slide.titulo}
+                    </p>
+                  )}
+                  {(slide?.subtitulo || slide?.corpo) && (
+                    <p
+                      className="text-white/70 mt-5 leading-relaxed font-light"
+                      style={{ fontSize: "clamp(0.82rem, 2.2vw, 1rem)" }}
+                    >
+                      {slide.subtitulo ?? slide.corpo}
+                    </p>
+                  )}
+                </div>
 
-                {slide?.titulo && (
-                  <p
-                    className="text-white font-serif font-semibold leading-[1.08] tracking-tight"
-                    style={{ fontSize: "clamp(1.9rem, 6.5vw, 3.2rem)" }}
-                  >
-                    {slide.titulo}
-                  </p>
-                )}
-
-                {(slide?.subtitulo || slide?.corpo) && (
-                  <p
-                    className="text-white/70 mt-5 leading-relaxed font-light"
-                    style={{ fontSize: "clamp(0.82rem, 2.2vw, 1rem)" }}
-                  >
-                    {slide.subtitulo ?? slide.corpo}
-                  </p>
-                )}
-              </div>
-
-              {/* rodapé */}
-              <div className="flex items-center justify-between mt-auto">
-                <div className="w-8 h-[1.5px] rounded-full" style={{ background: accent }} />
-                <span className="text-white/20 text-[9px] font-light">
-                  {slide?.numero} / {slides.length}
-                </span>
+                <div className="flex items-center justify-between mt-auto">
+                  <div className="w-8 h-[1.5px] rounded-full" style={{ background: accent }} />
+                  <span className="text-white/20 text-[9px] font-light">
+                    {slide?.numero} / {slides.length}
+                  </span>
+                </div>
               </div>
             </div>
+
+            {/* botão trocar imagem — fora do slide, à direita */}
+            <button
+              onClick={trocarImagem}
+              disabled={trocando}
+              title="Trocar imagem de fundo"
+              className="absolute -right-11 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-50"
+            >
+              <RefreshCw className={`h-4 w-4 text-muted-foreground ${trocando ? "animate-spin" : ""}`} />
+            </button>
           </div>
 
           {/* navegação */}
