@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { usePathname } from "next/navigation";
 import { Wand2, Loader2, ArrowRight, ChevronLeft, RefreshCw, BookOpen } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import PreviewCarrossel from "@/components/app/PreviewCarrossel";
@@ -15,10 +14,12 @@ type Etapa = "tema" | "narrativa" | "resultado";
 
 export default function GerarPage() {
   const { gerar, loading, resultado, setResultado, loadingMsg, upgradeMotivo, fecharUpgrade } = useGerar();
-  const pathname = usePathname();
 
   const [etapa, setEtapa] = useState<Etapa>("tema");
-  const [sugestoes, setSugestoes] = useState<string[]>([]);
+  const [sugestoes, setSugestoes] = useState<string[]>(() => {
+    const shuffled = [...SUGESTOES_POOL].sort(() => Math.random() - 0.5);
+    return shuffled.slice(0, 8);
+  });
   const [tema, setTema] = useState("");
   const [narrativas, setNarrativas] = useState<Narrativa[]>([]);
   const [narrativaIdx, setNarrativaIdx] = useState<number | null>(null);
@@ -31,10 +32,6 @@ export default function GerarPage() {
     if (resultado) setEtapa("resultado");
   }, [resultado]);
 
-  useEffect(() => {
-    const shuffled = [...SUGESTOES_POOL].sort(() => Math.random() - 0.5);
-    setSugestoes(shuffled.slice(0, 8));
-  }, [pathname]);
 
   async function buscarAngulos(temaOverride?: string) {
     const t = (temaOverride ?? tema).trim();

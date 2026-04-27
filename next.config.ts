@@ -1,6 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
+  experimental: {
+    staleTimes: {
+      dynamic: 0, // não armazena páginas no cache do router — garante remount a cada navegação
+    },
+  },
   async headers() {
     return [
       {
