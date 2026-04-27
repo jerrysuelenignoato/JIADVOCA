@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw } from "lucide-react";
+import { useState, useRef } from "react";
+import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw, Upload } from "lucide-react";
 import { toast } from "sonner";
 
 type Slide = {
@@ -61,6 +61,7 @@ export default function PreviewCarrossel({ conteudo }: Props) {
   const [slides, setSlides] = useState<Slide[]>(conteudo.slides ?? []);
   const [idx, setIdx] = useState(0);
   const [trocando, setTrocando] = useState(false);
+  const uploadRef = useRef<HTMLInputElement>(null);
 
   const slide = slides[idx];
   const bgIdx = (slide?.numero ?? 1) - 1;
@@ -89,6 +90,16 @@ export default function PreviewCarrossel({ conteudo }: Props) {
     }
   }
 
+  function handleUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setSlides((prev) =>
+      prev.map((s, i) => (i === idx ? { ...s, imagem_url: url } : s))
+    );
+    e.target.value = "";
+  }
+
   return (
     <div className="space-y-4">
       {/* headline */}
@@ -105,10 +116,19 @@ export default function PreviewCarrossel({ conteudo }: Props) {
       {/* slide */}
       {slides.length > 0 && (
         <div className="border border-border rounded-xl overflow-hidden">
-          <div className="relative">
+          <div className="relative pr-12">
+            {/* hidden file input */}
+            <input
+              ref={uploadRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleUpload}
+            />
             {/* slide visual */}
             <div
-              className="relative w-full aspect-square overflow-hidden flex flex-col"
+              className="relative w-full overflow-hidden flex flex-col"
+              style={{ aspectRatio: "1 / 1", maxHeight: "320px" }}
               style={{
                 background: bg,
                 ...(slide?.imagem_url && {
@@ -173,15 +193,24 @@ export default function PreviewCarrossel({ conteudo }: Props) {
               </div>
             </div>
 
-            {/* botão trocar imagem — fora do slide, à direita */}
-            <button
-              onClick={trocarImagem}
-              disabled={trocando}
-              title="Trocar imagem de fundo"
-              className="absolute -right-11 top-1/2 -translate-y-1/2 w-9 h-9 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-50"
-            >
-              <RefreshCw className={`h-4 w-4 text-muted-foreground ${trocando ? "animate-spin" : ""}`} />
-            </button>
+            {/* botões à direita do slide */}
+            <div className="absolute right-0 top-1/2 -translate-y-1/2 flex flex-col gap-2 w-10 items-center">
+              <button
+                onClick={trocarImagem}
+                disabled={trocando}
+                title="Trocar imagem de fundo"
+                className="w-9 h-9 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-50"
+              >
+                <RefreshCw className={`h-4 w-4 text-muted-foreground ${trocando ? "animate-spin" : ""}`} />
+              </button>
+              <button
+                onClick={() => uploadRef.current?.click()}
+                title="Enviar imagem própria"
+                className="w-9 h-9 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center hover:bg-secondary transition-colors"
+              >
+                <Upload className="h-4 w-4 text-muted-foreground" />
+              </button>
+            </div>
           </div>
 
           {/* navegação */}
