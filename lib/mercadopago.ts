@@ -4,7 +4,7 @@ const client = new MercadoPagoConfig({
   accessToken: process.env.MP_ACCESS_TOKEN!,
 });
 
-const PLANOS = { mensal: 97, anual: 797 } as const;
+const PLANOS = { mensal: 97, anual: 1380 } as const;
 
 export const PACKS_IA = {
   pack10:  { creditos: 10,  preco: 5.00,  label: "10 imagens"  },

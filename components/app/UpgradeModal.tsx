@@ -130,12 +130,12 @@ export default function UpgradeModal({ aberto, onFechar, motivo = "cota" }: Prop
             </span>
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Anual</p>
             <p className="text-xl font-bold mt-1">
-              R$797<span className="text-xs font-normal text-muted-foreground">/ano</span>
+              R$1.380<span className="text-xs font-normal text-muted-foreground">/ano</span>
             </p>
             <ul className="text-xs text-muted-foreground mt-3 space-y-1.5 flex-1">
               <li>✓ 60 gerações/mês</li>
               <li>✓ Reels + Carrosséis</li>
-              <li className="text-[#0F6E56] font-medium">✓ Economize R$727</li>
+              <li className="text-[#0F6E56] font-medium">✓ Economize R$144/ano</li>
               <li>✓ Suporte prioritário</li>
             </ul>
             <button

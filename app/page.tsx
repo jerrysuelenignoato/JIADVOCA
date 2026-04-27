@@ -310,11 +310,11 @@ export default function HomePage() {
               {/* anual */}
               <div className="bg-[#0C447C] rounded-2xl p-7 flex flex-col text-white relative overflow-hidden">
                 <span className="absolute top-4 right-4 bg-[#D97706] text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                  2 meses grátis
+                  Melhor custo-benefício
                 </span>
                 <p className="text-sm font-semibold text-white/60 uppercase tracking-wide">Anual</p>
-                <p className="mt-3 text-4xl font-bold">R$797</p>
-                <p className="text-white/60 text-sm">por ano · R$66/mês</p>
+                <p className="mt-3 text-4xl font-bold">R$1.380</p>
+                <p className="text-white/60 text-sm">por ano · R$115/mês</p>
                 <ul className="mt-6 space-y-3 flex-1">
                   {[
                     "7 dias grátis",
@@ -332,7 +332,7 @@ export default function HomePage() {
                   ))}
                   <li className="flex items-center gap-2.5 text-sm text-[#D97706] font-medium">
                     <CheckCircle2 className="h-4 w-4 text-[#D97706] shrink-0" />
-                    Economize R$727/ano
+                    Economize R$144/ano vs Plus
                   </li>
                 </ul>
                 <Link

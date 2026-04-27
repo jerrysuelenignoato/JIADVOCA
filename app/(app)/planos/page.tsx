@@ -47,9 +47,9 @@ const PLANOS = [
   {
     id: "anual",
     nome: "Anual",
-    preco: "R$797",
+    preco: "R$1.380",
     periodo: "/ano",
-    desc: "Tudo incluso com 2 meses grátis",
+    desc: "Tudo incluso · R$115/mês",
     recursos: [
       "60 gerações por mês",
       "Roteiro de carrossel",
@@ -58,11 +58,11 @@ const PLANOS = [
       "Biblioteca e Kanban",
       "Calendário editorial",
       "Suporte prioritário",
-      "2 meses grátis",
+      "Economize R$144 vs mensal",
     ],
     nao: [],
     cor: "border-[#D97706]",
-    badge: "Economize R$727",
+    badge: "Melhor custo-benefício",
   },
 ];
 
