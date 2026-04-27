@@ -21,7 +21,7 @@ const VARIANTES = [
   "Aborde as mudanças pós-Reforma da Previdência e o que mudou na prática.",
 ];
 
-const LIMITES = { trial: 5, mensal: 60, anual: 9999 };
+const LIMITES = { trial: 5, mensal: 60, mensal_plus: 60, anual: 9999 };
 
 const bodySchema = z.object({
   tipo: z.enum(["carrossel", "reel"]),
@@ -64,6 +64,11 @@ export async function POST(req: NextRequest) {
         .update({ status: "expirada" })
         .eq("user_id", user.id);
       return NextResponse.json({ error: "Trial expirado", code: "EXPIRED" }, { status: 403 });
+    }
+
+    // restrição de plano: mensal só gera reels
+    if (sub.plano === "mensal" && tipo === "carrossel") {
+      return NextResponse.json({ error: "Plano Reel não inclui carrosséis", code: "PLAN_UPGRADE_NEEDED" }, { status: 403 });
     }
 
     // verificar cota do mês

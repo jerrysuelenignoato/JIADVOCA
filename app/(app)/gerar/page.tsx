@@ -7,7 +7,7 @@ import PreviewCarrossel from "@/components/app/PreviewCarrossel";
 import PreviewReel from "@/components/app/PreviewReel";
 import UpgradeModal from "@/components/app/UpgradeModal";
 import { useGerar } from "@/hooks/useGerar";
-import { AREAS_PREVIDENCIARIAS, TONS_CONTEUDO } from "@/lib/utils";
+import { SUGESTOES_POOL, TONS_CONTEUDO } from "@/lib/utils";
 
 type Narrativa = { titulo: string; descricao: string };
 type Etapa = "tema" | "narrativa" | "resultado";
@@ -16,6 +16,7 @@ export default function GerarPage() {
   const { gerar, loading, resultado, setResultado, loadingMsg, upgradeMotivo, fecharUpgrade } = useGerar();
 
   const [etapa, setEtapa] = useState<Etapa>("tema");
+  const [sugestoes, setSugestoes] = useState<string[]>([]);
   const [tema, setTema] = useState("");
   const [narrativas, setNarrativas] = useState<Narrativa[]>([]);
   const [narrativaIdx, setNarrativaIdx] = useState<number | null>(null);
@@ -26,6 +27,11 @@ export default function GerarPage() {
   useEffect(() => {
     if (resultado) setEtapa("resultado");
   }, [resultado]);
+
+  useEffect(() => {
+    const shuffled = [...SUGESTOES_POOL].sort(() => Math.random() - 0.5);
+    setSugestoes(shuffled.slice(0, 8));
+  }, []);
 
   async function buscarAngulos(temaOverride?: string) {
     const t = (temaOverride ?? tema).trim();
@@ -107,9 +113,20 @@ export default function GerarPage() {
             </div>
 
             <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-3">Sugestões</p>
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-xs text-muted-foreground uppercase tracking-wide">Sugestões</p>
+                <button
+                  onClick={() => {
+                    const shuffled = [...SUGESTOES_POOL].sort(() => Math.random() - 0.5);
+                    setSugestoes(shuffled.slice(0, 8));
+                  }}
+                  className="text-xs text-[#0C447C] hover:underline"
+                >
+                  Outras sugestões
+                </button>
+              </div>
               <div className="flex flex-wrap gap-2">
-                {AREAS_PREVIDENCIARIAS.map((area) => (
+                {sugestoes.map((area) => (
                   <button
                     key={area}
                     onClick={() => { setTema(area); buscarAngulos(area); }}

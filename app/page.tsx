@@ -81,8 +81,12 @@ const FAQ = [
     r: "O JIADVOCA é especializado em direito previdenciário — e essa especialização é o que torna os conteúdos tão precisos e eficazes.",
   },
   {
+    p: "Qual a diferença entre os planos Reel e Completo?",
+    r: "O plano Reel (R$97) gera roteiros e scripts para Reels. O plano Completo (R$127) inclui tudo isso mais a criação de carrosséis prontos para o Instagram.",
+  },
+  {
     p: "Quantos posts consigo gerar por mês?",
-    r: "Nos planos pagos, 60 gerações por mês. Para a maioria dos advogados (3–4 posts/semana) isso é mais do que suficiente.",
+    r: "Em todos os planos pagos, 60 gerações por mês. Para a maioria dos advogados (3–4 posts/semana) isso é mais do que suficiente.",
   },
   {
     p: "Os textos podem ser usados sem edição?",
@@ -228,24 +232,35 @@ export default function HomePage() {
 
         {/* ── PREÇOS ───────────────────────────────────── */}
         <section id="precos" className="bg-[#F5F5F4] py-20 px-4 sm:px-6 border-y border-border">
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-4xl mx-auto">
             <div className="text-center mb-14">
               <h2 className="font-serif text-3xl sm:text-4xl">Preços simples</h2>
               <p className="mt-3 text-muted-foreground">Sem surpresas. Cancele quando quiser.</p>
             </div>
-            <div className="grid sm:grid-cols-2 gap-6">
-              {/* mensal */}
-              <div className="bg-white rounded-2xl border border-border p-8 flex flex-col">
-                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Mensal</p>
+            <div className="grid sm:grid-cols-3 gap-6">
+              {/* reel */}
+              <div className="bg-white rounded-2xl border border-border p-7 flex flex-col">
+                <p className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Reel</p>
                 <p className="mt-3 text-4xl font-bold">R$97</p>
                 <p className="text-muted-foreground text-sm">por mês</p>
                 <ul className="mt-6 space-y-3 flex-1">
-                  {["7 dias grátis para começar", "60 gerações por mês", "Carrosséis + Reels", "Biblioteca e Kanban", "Calendário editorial", "Suporte por email"].map((f) => (
+                  {[
+                    "7 dias grátis",
+                    "60 roteiros/mês",
+                    "Reels completos",
+                    "Biblioteca e Kanban",
+                    "Calendário editorial",
+                    "Suporte por email",
+                  ].map((f) => (
                     <li key={f} className="flex items-center gap-2.5 text-sm">
                       <CheckCircle2 className="h-4 w-4 text-[#0F6E56] shrink-0" />
                       {f}
                     </li>
                   ))}
+                  <li className="flex items-center gap-2.5 text-sm text-muted-foreground/60">
+                    <span className="h-4 w-4 shrink-0 text-center leading-none">✗</span>
+                    Carrosséis
+                  </li>
                 </ul>
                 <Link
                   href="/cadastro"
@@ -255,21 +270,68 @@ export default function HomePage() {
                 </Link>
               </div>
 
-              {/* anual */}
-              <div className="bg-[#0C447C] rounded-2xl p-8 flex flex-col text-white relative overflow-hidden">
-                <span className="absolute top-4 right-4 bg-[#D97706] text-white text-xs font-semibold px-2.5 py-1 rounded-full">
-                  Economize R$367
+              {/* completo */}
+              <div className="bg-white rounded-2xl border-2 border-[#0C447C] p-7 flex flex-col relative">
+                <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0C447C] text-white text-xs font-semibold px-3 py-1 rounded-full whitespace-nowrap">
+                  Mais popular
                 </span>
-                <p className="text-sm font-semibold text-white/60 uppercase tracking-wide">Anual</p>
-                <p className="mt-3 text-4xl font-bold">R$797</p>
-                <p className="text-white/60 text-sm">por ano · equivale a R$66/mês</p>
+                <p className="text-sm font-semibold text-[#0C447C] uppercase tracking-wide">Completo</p>
+                <p className="mt-3 text-4xl font-bold text-[#0C447C]">R$127</p>
+                <p className="text-muted-foreground text-sm">por mês</p>
                 <ul className="mt-6 space-y-3 flex-1">
-                  {["7 dias grátis para começar", "60 gerações por mês", "Carrosséis + Reels", "Biblioteca e Kanban", "Calendário editorial", "Suporte prioritário", "2 meses grátis"].map((f) => (
+                  {[
+                    "7 dias grátis",
+                    "60 gerações/mês",
+                    "Reels completos",
+                    "Biblioteca e Kanban",
+                    "Calendário editorial",
+                    "Suporte por email",
+                  ].map((f) => (
                     <li key={f} className="flex items-center gap-2.5 text-sm">
-                      <CheckCircle2 className="h-4 w-4 text-white/80 shrink-0" />
+                      <CheckCircle2 className="h-4 w-4 text-[#0F6E56] shrink-0" />
                       {f}
                     </li>
                   ))}
+                  <li className="flex items-center gap-2.5 text-sm text-[#0F6E56] font-medium">
+                    <CheckCircle2 className="h-4 w-4 text-[#0F6E56] shrink-0" />
+                    Carrosséis prontos
+                  </li>
+                </ul>
+                <Link
+                  href="/cadastro"
+                  className="mt-8 w-full py-3 rounded-xl bg-[#0C447C] text-white font-semibold text-center hover:bg-[#185FA5] transition-colors"
+                >
+                  Começar grátis
+                </Link>
+              </div>
+
+              {/* anual */}
+              <div className="bg-[#0C447C] rounded-2xl p-7 flex flex-col text-white relative overflow-hidden">
+                <span className="absolute top-4 right-4 bg-[#D97706] text-white text-xs font-semibold px-2.5 py-1 rounded-full">
+                  2 meses grátis
+                </span>
+                <p className="text-sm font-semibold text-white/60 uppercase tracking-wide">Anual</p>
+                <p className="mt-3 text-4xl font-bold">R$797</p>
+                <p className="text-white/60 text-sm">por ano · R$66/mês</p>
+                <ul className="mt-6 space-y-3 flex-1">
+                  {[
+                    "7 dias grátis",
+                    "60 gerações/mês",
+                    "Reels completos",
+                    "Biblioteca e Kanban",
+                    "Calendário editorial",
+                    "Suporte prioritário",
+                    "Carrosséis prontos",
+                  ].map((f) => (
+                    <li key={f} className="flex items-center gap-2.5 text-sm">
+                      <CheckCircle2 className="h-4 w-4 text-white/70 shrink-0" />
+                      {f}
+                    </li>
+                  ))}
+                  <li className="flex items-center gap-2.5 text-sm text-[#D97706] font-medium">
+                    <CheckCircle2 className="h-4 w-4 text-[#D97706] shrink-0" />
+                    Economize R$727/ano
+                  </li>
                 </ul>
                 <Link
                   href="/cadastro"

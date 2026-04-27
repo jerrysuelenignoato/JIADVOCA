@@ -38,7 +38,7 @@ function validarAssinatura(req: NextRequest, rawBody: string): boolean {
   return crypto.timingSafeEqual(Buffer.from(v1), Buffer.from(expected));
 }
 
-async function ativarAssinatura(userId: string, plano: "mensal" | "anual", mpPaymentId: string) {
+async function ativarAssinatura(userId: string, plano: "mensal" | "mensal_plus" | "anual", mpPaymentId: string) {
   const supabase = createAdminClient();
   const meses = plano === "anual" ? 12 : 1;
   const fim = new Date();
@@ -108,14 +108,15 @@ export async function POST(req: NextRequest) {
 
       // external_reference foi passado na URL de checkout
       const extRef = assinatura.external_reference ?? "";
-      const [userId] = extRef.split("|");
+      const [userId, planoRef] = extRef.split("|");
 
       if (!userId) {
         console.warn("[webhook/mp] preapproval sem external_reference:", data.id);
         return NextResponse.json({ received: true });
       }
 
-      await ativarAssinatura(userId, "mensal", String(assinatura.id));
+      const plano = planoRef === "mensal_plus" ? "mensal_plus" : "mensal";
+      await ativarAssinatura(userId, plano, String(assinatura.id));
     }
 
     return NextResponse.json({ received: true });

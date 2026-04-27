@@ -4,7 +4,7 @@ import { createClient } from "@/lib/supabase/server";
 import { criarPreferencia } from "@/lib/mercadopago";
 
 const bodySchema = z.object({
-  plano: z.enum(["mensal", "anual"]),
+  plano: z.enum(["mensal", "mensal_plus", "anual"]),
 });
 
 export async function POST(req: NextRequest) {
@@ -25,13 +25,14 @@ export async function POST(req: NextRequest) {
 
     const { plano } = parsed.data;
 
-    // plano mensal usa preapproval (assinatura recorrente MP)
-    if (plano === "mensal") {
-      const planId = process.env.MP_PREAPPROVAL_MENSAL;
+    // planos de assinatura recorrente via preapproval
+    if (plano === "mensal" || plano === "mensal_plus") {
+      const envKey = plano === "mensal" ? "MP_PREAPPROVAL_MENSAL" : "MP_PREAPPROVAL_MENSAL_PLUS";
+      const planId = process.env[envKey];
       if (!planId) {
-        return NextResponse.json({ error: "Plano mensal não configurado" }, { status: 500 });
+        return NextResponse.json({ error: "Plano não configurado" }, { status: 500 });
       }
-      const checkoutUrl = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=${planId}&external_reference=${user.id}|mensal`;
+      const checkoutUrl = `https://www.mercadopago.com.br/subscriptions/checkout?preapproval_plan_id=${planId}&external_reference=${user.id}|${plano}`;
       return NextResponse.json({ init_point: checkoutUrl });
     }
 

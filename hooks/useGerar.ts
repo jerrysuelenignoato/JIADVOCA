@@ -26,7 +26,7 @@ const LOADING_MSGS = [
   "Encontrando a dor do segurado...",
 ];
 
-export type MotivoUpgrade = "cota" | "expirado" | null;
+export type MotivoUpgrade = "cota" | "expirado" | "plano" | null;
 
 export function useGerar() {
   const [loading, setLoading] = useState(false);
@@ -55,6 +55,8 @@ export function useGerar() {
           setUpgradeMotivo("cota");
         } else if (data.code === "EXPIRED") {
           setUpgradeMotivo("expirado");
+        } else if (data.code === "PLAN_UPGRADE_NEEDED") {
+          setUpgradeMotivo("plano");
         } else {
           toast.error(data.error ?? "Erro ao gerar conteúdo");
         }
