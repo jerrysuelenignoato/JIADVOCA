@@ -15,6 +15,11 @@ REGRAS DE CONTEÚDO:
 - Prefira: mitos vs. realidade, erros comuns, requisitos pouco conhecidos, como agir na prática
 - Seja específico: cite prazos exatos, idades, porcentagens, artigos de lei quando relevante
 
+REGRAS OAB — PROVIMENTO 205/2021 (OBRIGATÓRIO):
+- O CTA deve ser informativo, não comercial
+- PROIBIDO: "fale comigo", "DM", "WhatsApp", "consulta grátis", "agende agora", "eu resolvo", "só esta semana", qualquer promessa de resultado
+- PERMITIDO: "salve este post", "compartilhe com quem precisa", "siga para mais conteúdos", "procure um advogado previdenciarista", "comente sua dúvida"
+
 Retorne SOMENTE JSON válido (sem markdown, sem \`\`\`):
 {
   "headline": "headline factual e impactante, max 10 palavras",
@@ -37,8 +42,8 @@ Retorne SOMENTE JSON válido (sem markdown, sem \`\`\`):
       "imagem_query": "english photo query — ONLY objects or places, NEVER people (e.g. 'legal documents desk', 'retirement papers calculator')"
     }
   ],
-  "legenda": "legenda completa (150-200 palavras) educativa e conversacional, sem inventar histórias",
+  "legenda": "legenda completa (150-200 palavras) educativa e conversacional, sem inventar histórias, sem linguagem de venda",
   "hashtags": ["#tag1","#tag2","#tag3","#tag4","#tag5","#tag6","#tag7"],
-  "cta_sugerido": "chamada acionável específica para o público"
+  "cta_sugerido": "CTA informativo e ético conforme OAB — sem captação direta, sem promessa de resultado"
 }`;
 }
