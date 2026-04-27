@@ -213,15 +213,6 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
         ctx.fill();
       }
 
-      // ── topo: tipo + marca ─────────────────────────────
-      ctx.font = "500 26px sans-serif";
-      ctx.fillStyle = "rgba(255,255,255,0.4)";
-      ctx.fillText((slide?.tipo ?? "").toUpperCase(), PAD, PAD + 26);
-      ctx.fillStyle = "rgba(255,255,255,0.25)";
-      ctx.textAlign = "right";
-      ctx.fillText("JIADVOCA", SIZE - PAD, PAD + 26);
-      ctx.textAlign = "left";
-
       // ── barra de acento ────────────────────────────────
       const midY = SIZE * 0.44;
       ctx.fillStyle = accent;
@@ -252,14 +243,9 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
         }
       }
 
-      // ── rodapé: linha + número ─────────────────────────
+      // ── rodapé: linha ──────────────────────────────────
       ctx.fillStyle = accent;
       ctx.fillRect(PAD, SIZE - PAD - 4, 86, 6);
-      ctx.font = "300 26px sans-serif";
-      ctx.fillStyle = "rgba(255,255,255,0.20)";
-      ctx.textAlign = "right";
-      ctx.fillText(`${slide?.numero ?? idx + 1} / ${slides.length}`, SIZE - PAD, SIZE - PAD);
-      ctx.textAlign = "left";
 
       // ── download ───────────────────────────────────────
       const link = document.createElement("a");
@@ -356,15 +342,6 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
 
               {/* conteúdo */}
               <div className="relative z-10 flex flex-col h-full p-8">
-                <div className="flex items-center justify-between mb-auto">
-                  <span className="text-white/40 text-[9px] tracking-[0.3em] uppercase font-medium">
-                    {slide?.tipo}
-                  </span>
-                  <span className="text-white/25 text-[9px] tracking-[0.2em] uppercase">
-                    JIADVOCA
-                  </span>
-                </div>
-
                 <div className="flex-1 flex flex-col justify-center py-4">
                   <div className="w-10 h-[3px] rounded-full mb-5" style={{ background: accent }} />
                   {slide?.titulo && (
@@ -385,11 +362,8 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
                   )}
                 </div>
 
-                <div className="flex items-center justify-between mt-auto">
+                <div className="mt-auto">
                   <div className="w-8 h-[1.5px] rounded-full" style={{ background: accent }} />
-                  <span className="text-white/20 text-[9px] font-light">
-                    {slide?.numero} / {slides.length}
-                  </span>
                 </div>
               </div>
             </div>
