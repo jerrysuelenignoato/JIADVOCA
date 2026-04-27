@@ -8,6 +8,7 @@ import {
   BookOpen,
   Kanban,
   CalendarDays,
+  CreditCard,
   Settings,
   LogOut,
 } from "lucide-react";
@@ -22,6 +23,7 @@ const NAV = [
   { href: "/biblioteca", label: "Biblioteca", icon: BookOpen },
   { href: "/kanban", label: "Kanban", icon: Kanban },
   { href: "/calendario", label: "Calendário", icon: CalendarDays },
+  { href: "/planos", label: "Planos", icon: CreditCard },
   { href: "/conta", label: "Conta", icon: Settings },
 ];
 
