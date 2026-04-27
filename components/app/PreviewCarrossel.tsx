@@ -154,45 +154,147 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
   }
 
   async function baixarSlide() {
-    if (!slideRef.current) return;
     setBaixando(true);
-
-    // se o slide tem imagem externa, busca via proxy para evitar canvas tainted
-    let blobUrl: string | null = null;
-    const imagemOriginal = slide?.imagem_url;
     try {
-      if (imagemOriginal && imagemOriginal.startsWith("http")) {
-        const proxyRes = await fetch(`/api/proxy-image?url=${encodeURIComponent(imagemOriginal)}`);
-        if (proxyRes.ok) {
-          const blob = await proxyRes.blob();
-          blobUrl = URL.createObjectURL(blob);
-          // aplica temporariamente a URL local no elemento
-          slideRef.current.style.backgroundImage = `url(${blobUrl})`;
+      const SIZE = 1080;
+      const PAD = 88;
+      const canvas = document.createElement("canvas");
+      canvas.width = SIZE;
+      canvas.height = SIZE;
+      const ctx = canvas.getContext("2d")!;
+
+      // ── fundo ──────────────────────────────────────────
+      if (slide?.imagem_url) {
+        const src = slide.imagem_url.startsWith("blob:")
+          ? slide.imagem_url
+          : `/api/proxy-image?url=${encodeURIComponent(slide.imagem_url)}`;
+        const img = await carregarImg(src);
+
+        const scale = adj.scale / 100;
+        const drawW = SIZE * scale;
+        const drawH = (drawW / img.width) * img.height;
+        const drawX = (SIZE - drawW) * (adj.x / 100);
+        const drawY = (SIZE - drawH) * (adj.y / 100);
+        ctx.drawImage(img, drawX, drawY, drawW, drawH);
+
+        // overlay escuro
+        const ov = ctx.createLinearGradient(0, 0, 0, SIZE);
+        ov.addColorStop(0,    "rgba(0,0,0,0.12)");
+        ov.addColorStop(0.35, "rgba(0,0,0,0.22)");
+        ov.addColorStop(0.65, "rgba(0,0,0,0.80)");
+        ov.addColorStop(1,    "rgba(0,0,0,0.92)");
+        ctx.fillStyle = ov;
+        ctx.fillRect(0, 0, SIZE, SIZE);
+      } else {
+        // gradiente a partir da string CSS
+        const m = bg.match(/(\d+)deg[^#]*(#[0-9A-Fa-f]{6})[^#]*(#[0-9A-Fa-f]{6})/);
+        if (m) {
+          const ang = (parseInt(m[1]) - 90) * (Math.PI / 180);
+          const grd = ctx.createLinearGradient(
+            SIZE / 2 - SIZE / 2 * Math.cos(ang), SIZE / 2 - SIZE / 2 * Math.sin(ang),
+            SIZE / 2 + SIZE / 2 * Math.cos(ang), SIZE / 2 + SIZE / 2 * Math.sin(ang),
+          );
+          grd.addColorStop(0, m[2]);
+          grd.addColorStop(1, m[3]);
+          ctx.fillStyle = grd;
+        } else {
+          ctx.fillStyle = "#0C447C";
+        }
+        ctx.fillRect(0, 0, SIZE, SIZE);
+
+        // círculos decorativos
+        ctx.beginPath();
+        ctx.arc(SIZE + 80, -80, 288, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.04)";
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(-64, SIZE + 64, 224, 0, Math.PI * 2);
+        ctx.fillStyle = "rgba(255,255,255,0.03)";
+        ctx.fill();
+      }
+
+      // ── topo: tipo + marca ─────────────────────────────
+      ctx.font = "500 26px sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.4)";
+      ctx.fillText((slide?.tipo ?? "").toUpperCase(), PAD, PAD + 26);
+      ctx.fillStyle = "rgba(255,255,255,0.25)";
+      ctx.textAlign = "right";
+      ctx.fillText("JIADVOCA", SIZE - PAD, PAD + 26);
+      ctx.textAlign = "left";
+
+      // ── barra de acento ────────────────────────────────
+      const midY = SIZE * 0.44;
+      ctx.fillStyle = accent;
+      ctx.fillRect(PAD, midY, 108, 12);
+
+      // ── título ─────────────────────────────────────────
+      let textY = midY + 76;
+      if (slide?.titulo) {
+        ctx.font = "600 74px Georgia, serif";
+        ctx.fillStyle = "#ffffff";
+        const titleLines = quebrarTexto(ctx, slide.titulo, SIZE - PAD * 2);
+        for (const ln of titleLines) {
+          ctx.fillText(ln, PAD, textY);
+          textY += 88;
         }
       }
 
-      const html2canvas = (await import("html2canvas")).default;
-      const canvas = await html2canvas(slideRef.current, {
-        useCORS: true,
-        allowTaint: false,
-        scale: 3,
-        backgroundColor: null,
-        logging: false,
-      });
+      // ── subtítulo / corpo ──────────────────────────────
+      const sub = slide?.subtitulo ?? slide?.corpo;
+      if (sub) {
+        textY += 20;
+        ctx.font = "300 34px sans-serif";
+        ctx.fillStyle = "rgba(255,255,255,0.70)";
+        const subLines = quebrarTexto(ctx, sub, SIZE - PAD * 2);
+        for (const ln of subLines.slice(0, 5)) {
+          ctx.fillText(ln, PAD, textY);
+          textY += 46;
+        }
+      }
+
+      // ── rodapé: linha + número ─────────────────────────
+      ctx.fillStyle = accent;
+      ctx.fillRect(PAD, SIZE - PAD - 4, 86, 6);
+      ctx.font = "300 26px sans-serif";
+      ctx.fillStyle = "rgba(255,255,255,0.20)";
+      ctx.textAlign = "right";
+      ctx.fillText(`${slide?.numero ?? idx + 1} / ${slides.length}`, SIZE - PAD, SIZE - PAD);
+      ctx.textAlign = "left";
+
+      // ── download ───────────────────────────────────────
       const link = document.createElement("a");
-      link.download = `slide-${(slide?.numero ?? idx + 1)}-jiadvoca.png`;
+      link.download = `slide-${slide?.numero ?? idx + 1}-jiadvoca.png`;
       link.href = canvas.toDataURL("image/png");
       link.click();
-    } catch {
+    } catch (e) {
+      console.error("[baixarSlide]", e);
       toast.error("Erro ao baixar imagem");
     } finally {
-      // restaura a imagem original e libera blob
-      if (slideRef.current && imagemOriginal) {
-        slideRef.current.style.backgroundImage = `url(${imagemOriginal})`;
-      }
-      if (blobUrl) URL.revokeObjectURL(blobUrl);
       setBaixando(false);
     }
+  }
+
+  function carregarImg(src: string): Promise<HTMLImageElement> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+  }
+
+  function quebrarTexto(ctx: CanvasRenderingContext2D, text: string, maxW: number): string[] {
+    const words = text.split(" ");
+    const lines: string[] = [];
+    let cur = "";
+    for (const w of words) {
+      const test = cur ? `${cur} ${w}` : w;
+      if (ctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = w; }
+      else cur = test;
+    }
+    if (cur) lines.push(cur);
+    return lines;
   }
 
   return (
