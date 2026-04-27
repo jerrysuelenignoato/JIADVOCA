@@ -9,6 +9,7 @@
   --font-sans: var(--font-inter);
   --font-mono: ui-monospace, monospace;
   --font-serif: var(--font-instrument-serif);
+  --font-display: var(--font-playfair);
 
   /* brand colors mapped to Tailwind tokens */
   --color-background: var(--background);
