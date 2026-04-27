@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw, Upload, SlidersHorizontal, X, Download } from "lucide-react";
+import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw, Upload, SlidersHorizontal, X, Download, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 
 type Slide = {
@@ -26,6 +26,7 @@ type Props = {
     hashtags?: string[];
     cta_sugerido?: string;
   };
+  area?: string;
 };
 
 const BG_GRADIENTS = [
@@ -61,13 +62,14 @@ function CopyBtn({ text }: { text: string }) {
   );
 }
 
-export default function PreviewCarrossel({ conteudo }: Props) {
+export default function PreviewCarrossel({ conteudo, area }: Props) {
   const [slides, setSlides] = useState<Slide[]>(conteudo.slides ?? []);
   const [idx, setIdx] = useState(0);
   const [trocando, setTrocando] = useState(false);
   const [adjustments, setAdjustments] = useState<Record<number, ImageAdjust>>({});
   const [adjusting, setAdjusting] = useState(false);
   const [baixando, setBaixando] = useState(false);
+  const [gerandoIA, setGerandoIA] = useState(false);
   const uploadRef = useRef<HTMLInputElement>(null);
   const slideRef = useRef<HTMLDivElement>(null);
 
@@ -118,6 +120,34 @@ export default function PreviewCarrossel({ conteudo }: Props) {
       ...prev,
       [idx]: { ...(prev[idx] ?? DEFAULT_ADJUST), [field]: value },
     }));
+  }
+
+  async function gerarComIA() {
+    setGerandoIA(true);
+    setAdjusting(false);
+    try {
+      const res = await fetch("/api/generate-image", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ titulo: slide?.titulo ?? "", tema: area ?? "" }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        setSlides((prev) =>
+          prev.map((s, i) => (i === idx ? { ...s, imagem_url: data.url } : s))
+        );
+        setAdjustments((prev) => ({ ...prev, [idx]: DEFAULT_ADJUST }));
+        toast.success("Imagem gerada com IA!");
+      } else if (data.code === "PLAN_UPGRADE_NEEDED") {
+        toast.error("Requer plano Plus ou Anual");
+      } else {
+        toast.error("Erro ao gerar imagem com IA");
+      }
+    } catch {
+      toast.error("Erro ao gerar imagem com IA");
+    } finally {
+      setGerandoIA(false);
+    }
   }
 
   async function baixarSlide() {
@@ -270,6 +300,14 @@ export default function PreviewCarrossel({ conteudo }: Props) {
                   <SlidersHorizontal className="h-4 w-4" />
                 </button>
               )}
+              <button
+                onClick={gerarComIA}
+                disabled={gerandoIA}
+                title="Gerar fundo com IA"
+                className="w-9 h-9 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-50"
+              >
+                <Sparkles className={`h-4 w-4 text-[#D97706] ${gerandoIA ? "animate-pulse" : ""}`} />
+              </button>
               <button
                 onClick={baixarSlide}
                 disabled={baixando}

@@ -300,7 +300,7 @@ export default function GerarPage() {
                 <Skeleton className="h-28 rounded-xl" />
               </div>
             ) : tipo === "carrossel" ? (
-              <PreviewCarrossel conteudo={resultado.conteudo as Parameters<typeof PreviewCarrossel>[0]["conteudo"]} />
+              <PreviewCarrossel conteudo={resultado.conteudo as Parameters<typeof PreviewCarrossel>[0]["conteudo"]} area={tema} />
             ) : (
               <PreviewReel conteudo={resultado.conteudo as Parameters<typeof PreviewReel>[0]["conteudo"]} />
             )}
