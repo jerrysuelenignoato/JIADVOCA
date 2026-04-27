@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import AppSidebar from "@/components/app/AppSidebar";
+import PageRemounter from "@/components/app/PageRemounter";
 
 export default async function AppLayout({
   children,
@@ -17,7 +18,7 @@ export default async function AppLayout({
   return (
     <div className="flex min-h-screen bg-[#F5F5F4]">
       <AppSidebar user={user} />
-      <main className="flex-1 overflow-auto">{children}</main>
+      <PageRemounter>{children}</PageRemounter>
     </div>
   );
 }
