@@ -156,7 +156,21 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
   async function baixarSlide() {
     if (!slideRef.current) return;
     setBaixando(true);
+
+    // se o slide tem imagem externa, busca via proxy para evitar canvas tainted
+    let blobUrl: string | null = null;
+    const imagemOriginal = slide?.imagem_url;
     try {
+      if (imagemOriginal && imagemOriginal.startsWith("http")) {
+        const proxyRes = await fetch(`/api/proxy-image?url=${encodeURIComponent(imagemOriginal)}`);
+        if (proxyRes.ok) {
+          const blob = await proxyRes.blob();
+          blobUrl = URL.createObjectURL(blob);
+          // aplica temporariamente a URL local no elemento
+          slideRef.current.style.backgroundImage = `url(${blobUrl})`;
+        }
+      }
+
       const html2canvas = (await import("html2canvas")).default;
       const canvas = await html2canvas(slideRef.current, {
         useCORS: true,
@@ -172,6 +186,11 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
     } catch {
       toast.error("Erro ao baixar imagem");
     } finally {
+      // restaura a imagem original e libera blob
+      if (slideRef.current && imagemOriginal) {
+        slideRef.current.style.backgroundImage = `url(${imagemOriginal})`;
+      }
+      if (blobUrl) URL.revokeObjectURL(blobUrl);
       setBaixando(false);
     }
   }
