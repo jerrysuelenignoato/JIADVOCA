@@ -1,13 +1,51 @@
+const ANGULOS_REEL = [
+  "mito derrubado — comece afirmando que a crença mais comum sobre esse tema está errada",
+  "revelação de dado — abra com número real que choca e explique o que ele significa",
+  "erro fatal — mostre o erro que faz o segurado perder o benefício sem perceber",
+  "passo a passo urgente — ensine o que fazer agora mesmo em situação específica",
+  "comparativo direto — explique a diferença entre dois conceitos ou benefícios confundidos",
+  "pergunta que todo mundo tem — responda a dúvida mais buscada sobre o tema",
+  "artigo de lei traduzido — cite o texto da lei e explique palavra por palavra",
+  "quem tem e quem não tem — critérios claros com exemplos opostos",
+  "prazo crítico — alerte sobre prazo legal que quase ninguém conhece",
+  "caso hipotético anônimo — crie personagem fictício para ilustrar a situação",
+  "antes e depois da reforma — contraste a regra antiga com a nova de forma visual",
+  "o que o INSS não te conta — informação real que o sistema não divulga ativamente",
+  "documentos que salvam ou afundam — liste os documentos mais ignorados",
+  "recurso possível — explique que é possível recorrer e como iniciar",
+  "valor real — revele quanto o segurado recebe e como é calculado",
+] as const;
+
+function angulo(): string {
+  return ANGULOS_REEL[Math.floor(Math.random() * ANGULOS_REEL.length)];
+}
+
 export function buildReelPrompt(
   area: string,
   tom: string,
   duracao: number,
   extra?: string
 ) {
+  const anguloEscolhido = angulo();
+
   return `Crie um roteiro de Reel educativo de Instagram com ${duracao} segundos sobre "${area}".
 
 Tom: ${tom}
 ${extra ? `Contexto adicional: ${extra}` : ""}
+
+━━━ ÂNGULO OBRIGATÓRIO DESTA GERAÇÃO ━━━
+${anguloEscolhido}
+Este ângulo DEVE definir o gancho, a estrutura e a conclusão do reel.
+Mesmo que o tema seja repetido, o conteúdo deve ser completamente diferente por causa deste ângulo.
+
+━━━ VARIAÇÃO ESTRUTURAL ━━━
+- O gancho não pode começar sempre com "Você sabia que...". Use variedade:
+  → Afirmação direta: "A maioria das pessoas perde esse benefício por causa de um único erro."
+  → Pergunta específica: "Você tem 65 anos e nunca contribuiu? Existe um benefício para você."
+  → Dado chocante: "Mais de 2 milhões de brasileiros têm direito ao BPC e nunca solicitaram."
+  → Contraponto: "O INSS negou? Isso não significa que você não tem direito."
+- Varie o ritmo: alguns reels são mais cadenciados, outros são urgentes e diretos
+- A prova pode ser um artigo de lei, uma estatística ou uma comparação concreta
 
 REGRAS DE CONTEÚDO:
 - Use apenas fatos reais: prazos legais, requisitos da Lei 8.213/91, dados do INSS

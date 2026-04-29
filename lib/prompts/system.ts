@@ -44,4 +44,13 @@ FONTES ACEITAS:
 - Erros que fazem segurados perderem benefícios
 - Diferenças entre benefícios que confundem as pessoas
 
+━━━ VARIAÇÃO OBRIGATÓRIA — NUNCA REPITA ━━━
+
+Cada geração DEVE ser única. Mesmo que o tema seja o mesmo de um post anterior:
+  • Escolha um ÂNGULO diferente (mito, passo a passo, alerta, comparativo, artigo de lei, estatística, pergunta, etc.)
+  • Use uma ESTRUTURA diferente (começo com dado, começo com pergunta, começo com afirmação, etc.)
+  • Escolha EXEMPLOS diferentes, números diferentes, trechos de lei diferentes
+  • Varie o NÍVEL DE DETALHE: ora mais superficial e amplo, ora mais técnico e específico
+  • Varie o PONTO DE VISTA: ora do segurado leigo, ora do profissional que orienta
+
 NUNCA escreva conteúdo vago. Seja específico, educativo e baseado em fatos reais.`;

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw, Upload, SlidersHorizontal, X, Download, Sparkles } from "lucide-react";
+import { Copy, Check, ChevronLeft, ChevronRight, RefreshCw, Upload, SlidersHorizontal, X, Download, Sparkles, Type, Pencil } from "lucide-react";
 import { toast } from "sonner";
 import IAImageModal from "@/components/app/IAImageModal";
 
@@ -17,6 +17,7 @@ type Slide = {
 };
 
 type ImageAdjust = { x: number; y: number; scale: number };
+type TextStyle = { fontFamily: string; titleSize: number; bodySize: number };
 
 type Props = {
   conteudo: {
@@ -41,8 +42,18 @@ const BG_GRADIENTS = [
 ];
 
 const ACCENT_COLORS = ["#0F6E56", "#185FA5", "#D97706", "#0F6E56", "#185FA5", "#0F6E56", "#D97706"];
-
 const DEFAULT_ADJUST: ImageAdjust = { x: 50, y: 50, scale: 110 };
+const DEFAULT_TEXT_STYLE: TextStyle = { fontFamily: "Georgia, serif", titleSize: 74, bodySize: 34 };
+
+const FONT_OPTIONS = [
+  { label: "Georgia (Serif)", value: "Georgia, serif" },
+  { label: "Arial", value: "Arial, sans-serif" },
+  { label: "Helvetica Neue", value: "'Helvetica Neue', Helvetica, sans-serif" },
+  { label: "Times New Roman", value: "'Times New Roman', serif" },
+  { label: "Verdana", value: "Verdana, sans-serif" },
+  { label: "Trebuchet MS", value: "'Trebuchet MS', sans-serif" },
+  { label: "Courier New (Mono)", value: "'Courier New', Courier, monospace" },
+];
 
 function CopyBtn({ text }: { text: string }) {
   const [copied, setCopied] = useState(false);
@@ -69,6 +80,9 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
   const [trocando, setTrocando] = useState(false);
   const [adjustments, setAdjustments] = useState<Record<number, ImageAdjust>>({});
   const [adjusting, setAdjusting] = useState(false);
+  const [editingText, setEditingText] = useState(false);
+  const [editingField, setEditingField] = useState<"titulo" | "subtitulo" | "corpo" | null>(null);
+  const [textStyle, setTextStyle] = useState<TextStyle>(DEFAULT_TEXT_STYLE);
   const [baixando, setBaixando] = useState(false);
   const [gerandoIA, setGerandoIA] = useState(false);
   const [iaModalAberto, setIAModalAberto] = useState(false);
@@ -80,6 +94,12 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
   const bg = BG_GRADIENTS[bgIdx % BG_GRADIENTS.length];
   const accent = ACCENT_COLORS[bgIdx % ACCENT_COLORS.length];
   const adj = adjustments[idx] ?? DEFAULT_ADJUST;
+
+  function editSlideField(field: "titulo" | "subtitulo" | "corpo", value: string) {
+    setSlides((prev) =>
+      prev.map((s, i) => (i === idx ? { ...s, [field]: value } : s))
+    );
+  }
 
   async function trocarImagem() {
     setTrocando(true);
@@ -177,7 +197,6 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
         const drawY = (SIZE - drawH) * (adj.y / 100);
         ctx.drawImage(img, drawX, drawY, drawW, drawH);
 
-        // overlay escuro
         const ov = ctx.createLinearGradient(0, 0, 0, SIZE);
         ov.addColorStop(0,    "rgba(0,0,0,0.12)");
         ov.addColorStop(0.35, "rgba(0,0,0,0.22)");
@@ -186,7 +205,6 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
         ctx.fillStyle = ov;
         ctx.fillRect(0, 0, SIZE, SIZE);
       } else {
-        // gradiente a partir da string CSS
         const m = bg.match(/(\d+)deg[^#]*(#[0-9A-Fa-f]{6})[^#]*(#[0-9A-Fa-f]{6})/);
         if (m) {
           const ang = (parseInt(m[1]) - 90) * (Math.PI / 180);
@@ -202,7 +220,6 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
         }
         ctx.fillRect(0, 0, SIZE, SIZE);
 
-        // círculos decorativos
         ctx.beginPath();
         ctx.arc(SIZE + 80, -80, 288, 0, Math.PI * 2);
         ctx.fillStyle = "rgba(255,255,255,0.04)";
@@ -221,12 +238,13 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
       // ── título ─────────────────────────────────────────
       let textY = midY + 76;
       if (slide?.titulo) {
-        ctx.font = "600 74px Georgia, serif";
+        ctx.font = `600 ${textStyle.titleSize}px ${textStyle.fontFamily}`;
         ctx.fillStyle = "#ffffff";
         const titleLines = quebrarTexto(ctx, slide.titulo, SIZE - PAD * 2);
+        const titleLineH = Math.round(textStyle.titleSize * 1.19);
         for (const ln of titleLines) {
           ctx.fillText(ln, PAD, textY);
-          textY += 88;
+          textY += titleLineH;
         }
       }
 
@@ -234,12 +252,13 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
       const sub = slide?.subtitulo ?? slide?.corpo;
       if (sub) {
         textY += 20;
-        ctx.font = "300 34px sans-serif";
+        ctx.font = `300 ${textStyle.bodySize}px ${textStyle.fontFamily}`;
         ctx.fillStyle = "rgba(255,255,255,0.70)";
         const subLines = quebrarTexto(ctx, sub, SIZE - PAD * 2);
+        const bodyLineH = Math.round(textStyle.bodySize * 1.35);
         for (const ln of subLines.slice(0, 5)) {
           ctx.fillText(ln, PAD, textY);
-          textY += 46;
+          textY += bodyLineH;
         }
       }
 
@@ -283,6 +302,10 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
     return lines;
   }
 
+  // preview font sizes scaled proportionally from canvas sizes
+  const previewTitleSize = `${(textStyle.titleSize / 74 * 2.5).toFixed(2)}rem`;
+  const previewBodySize = `${(textStyle.bodySize / 34 * 0.9).toFixed(2)}rem`;
+
   return (
     <div className="space-y-4">
       {/* headline */}
@@ -309,7 +332,7 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
               onChange={handleUpload}
             />
 
-            {/* slide visual — fixed square capped at 360px */}
+            {/* slide visual */}
             <div
               ref={slideRef}
               className="relative w-full overflow-hidden flex flex-col"
@@ -345,20 +368,69 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
                 <div className="flex-1 flex flex-col justify-center py-4">
                   <div className="w-10 h-[3px] rounded-full mb-5" style={{ background: accent }} />
                   {slide?.titulo && (
-                    <p
-                      className="text-white font-serif font-semibold leading-[1.08] tracking-tight"
-                      style={{ fontSize: "clamp(1.9rem, 6.5vw, 3.2rem)" }}
-                    >
-                      {slide.titulo}
-                    </p>
+                    <div className="relative group">
+                      {editingField === "titulo" ? (
+                        <textarea
+                          autoFocus
+                          value={slide.titulo}
+                          onChange={(e) => editSlideField("titulo", e.target.value)}
+                          onBlur={() => setEditingField(null)}
+                          rows={2}
+                          className="w-full bg-transparent text-white font-semibold leading-[1.08] tracking-tight resize-none border-b border-white/50 focus:outline-none focus:border-white"
+                          style={{ fontFamily: textStyle.fontFamily, fontSize: previewTitleSize }}
+                        />
+                      ) : (
+                        <>
+                          <p
+                            className="text-white font-semibold leading-[1.08] tracking-tight cursor-text"
+                            style={{ fontFamily: textStyle.fontFamily, fontSize: previewTitleSize }}
+                            onClick={() => setEditingField("titulo")}
+                          >
+                            {slide.titulo}
+                          </p>
+                          <button
+                            onClick={() => setEditingField("titulo")}
+                            className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 bg-white/20 hover:bg-white/35 rounded flex items-center justify-center"
+                          >
+                            <Pencil className="h-2.5 w-2.5 text-white" />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   )}
                   {(slide?.subtitulo || slide?.corpo) && (
-                    <p
-                      className="text-white/70 mt-5 leading-relaxed font-light"
-                      style={{ fontSize: "clamp(0.82rem, 2.2vw, 1rem)" }}
-                    >
-                      {slide.subtitulo ?? slide.corpo}
-                    </p>
+                    <div className="relative group mt-5">
+                      {editingField === "subtitulo" || editingField === "corpo" ? (
+                        <textarea
+                          autoFocus
+                          value={slide.subtitulo ?? slide.corpo ?? ""}
+                          onChange={(e) => {
+                            if (slide.subtitulo !== undefined) editSlideField("subtitulo", e.target.value);
+                            else editSlideField("corpo", e.target.value);
+                          }}
+                          onBlur={() => setEditingField(null)}
+                          rows={3}
+                          className="w-full bg-transparent text-white/70 leading-relaxed font-light resize-none border-b border-white/30 focus:outline-none focus:border-white/60"
+                          style={{ fontFamily: textStyle.fontFamily, fontSize: previewBodySize }}
+                        />
+                      ) : (
+                        <>
+                          <p
+                            className="text-white/70 leading-relaxed font-light cursor-text"
+                            style={{ fontFamily: textStyle.fontFamily, fontSize: previewBodySize }}
+                            onClick={() => setEditingField(slide.subtitulo !== undefined ? "subtitulo" : "corpo")}
+                          >
+                            {slide.subtitulo ?? slide.corpo}
+                          </p>
+                          <button
+                            onClick={() => setEditingField(slide.subtitulo !== undefined ? "subtitulo" : "corpo")}
+                            className="absolute -top-1 -right-1 opacity-0 group-hover:opacity-100 transition-opacity w-5 h-5 bg-white/20 hover:bg-white/35 rounded flex items-center justify-center"
+                          >
+                            <Pencil className="h-2.5 w-2.5 text-white" />
+                          </button>
+                        </>
+                      )}
+                    </div>
                   )}
                 </div>
 
@@ -387,7 +459,7 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
               </button>
               {slide?.imagem_url && (
                 <button
-                  onClick={() => setAdjusting((v) => !v)}
+                  onClick={() => { setAdjusting((v) => !v); setEditingText(false); }}
                   title="Ajustar imagem"
                   className={`w-9 h-9 rounded-xl border shadow-sm flex items-center justify-center transition-colors ${
                     adjusting
@@ -413,6 +485,17 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
                 className="w-9 h-9 rounded-xl bg-white border border-border shadow-sm flex items-center justify-center hover:bg-secondary transition-colors disabled:opacity-50"
               >
                 <Download className={`h-4 w-4 text-muted-foreground ${baixando ? "animate-bounce" : ""}`} />
+              </button>
+              <button
+                onClick={() => { setEditingText((v) => !v); setAdjusting(false); }}
+                title="Editar texto e fonte"
+                className={`w-9 h-9 rounded-xl border shadow-sm flex items-center justify-center transition-colors ${
+                  editingText
+                    ? "bg-[#0C447C] border-[#0C447C] text-white"
+                    : "bg-white border-border hover:bg-secondary text-muted-foreground"
+                }`}
+              >
+                <Type className="h-4 w-4" />
               </button>
             </div>
           </div>
@@ -456,6 +539,59 @@ export default function PreviewCarrossel({ conteudo, area }: Props) {
                     className="flex-1 accent-[#0C447C] h-1.5"
                   />
                   <span className="text-xs text-muted-foreground w-10 text-right">{adj.y}%</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* painel de edição de texto */}
+          {editingText && (
+            <div className="border-t border-border bg-[#FAFAF9] px-4 py-3 space-y-3">
+              <div className="flex items-center justify-between">
+                <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Fonte e tamanho</p>
+                <button onClick={() => setEditingText(false)} className="text-muted-foreground hover:text-foreground">
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+              <p className="text-[11px] text-muted-foreground/70">Clique no texto do slide para editar o conteúdo.</p>
+              <div className="space-y-3">
+                {/* fonte */}
+                <div>
+                  <label className="text-xs text-muted-foreground block mb-1">Fonte</label>
+                  <select
+                    value={textStyle.fontFamily}
+                    onChange={(e) => setTextStyle((s) => ({ ...s, fontFamily: e.target.value }))}
+                    className="w-full text-sm border border-border rounded-lg px-3 py-2 bg-white focus:outline-none focus:ring-1 focus:ring-[#0C447C]"
+                    style={{ fontFamily: textStyle.fontFamily }}
+                  >
+                    {FONT_OPTIONS.map((f) => (
+                      <option key={f.value} value={f.value} style={{ fontFamily: f.value }}>
+                        {f.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                {/* tamanho do título */}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground w-16">Título</span>
+                  <input
+                    type="range" min={40} max={120} step={2}
+                    value={textStyle.titleSize}
+                    onChange={(e) => setTextStyle((s) => ({ ...s, titleSize: Number(e.target.value) }))}
+                    className="flex-1 accent-[#0C447C] h-1.5"
+                  />
+                  <span className="text-xs text-muted-foreground w-10 text-right">{textStyle.titleSize}px</span>
+                </div>
+                {/* tamanho do corpo */}
+                <div className="flex items-center gap-3">
+                  <span className="text-xs text-muted-foreground w-16">Corpo</span>
+                  <input
+                    type="range" min={16} max={60} step={2}
+                    value={textStyle.bodySize}
+                    onChange={(e) => setTextStyle((s) => ({ ...s, bodySize: Number(e.target.value) }))}
+                    className="flex-1 accent-[#0C447C] h-1.5"
+                  />
+                  <span className="text-xs text-muted-foreground w-10 text-right">{textStyle.bodySize}px</span>
                 </div>
               </div>
             </div>
